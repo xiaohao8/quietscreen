@@ -1,0 +1,107 @@
+<UserControl x:Class="QuietScreen.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+            <!-- 驱动状态 -->
+            <Border Style="{StaticResource Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="DriverDot" Width="10" Height="10" Margin="0,0,9,0"
+                                     VerticalAlignment="Center" Fill="{StaticResource BrushYellow}"/>
+                            <StackPanel>
+                                <TextBlock x:Name="DriverText" Text="检测驱动中..." Style="{StaticResource H2}"/>
+                                <TextBlock x:Name="DriverSubText" Text="Parsec 虚拟屏驱动 (内置开源 VDD 控制)"
+                                           Style="{StaticResource Sub}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Button x:Name="BtnCheckDriver" Style="{StaticResource BtnDark}" Content="重新检测"
+                                HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnCheckDriver_Click"/>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,14,0,0"
+                                x:Name="InstallPanel" Visibility="Collapsed">
+                        <Button x:Name="BtnInstallDrv" Style="{StaticResource BtnPrimary}"
+                                Content="一键安装虚拟屏驱动 (免下载)" Click="BtnInstallDrv_Click"/>
+                        <TextBlock Style="{StaticResource Sub}" Margin="12,0,0,0" VerticalAlignment="Center" MaxWidth="560"
+                                   Text="内置 Parsec 官方驱动包 v0.45 (开源项目同款), 提权静默安装。装完即用, 无需任何手动配置。"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 当前显示器 -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="当前显示器" Style="{StaticResource H2}"/>
+                        <Button x:Name="BtnRefresh" Style="{StaticResource BtnDark}" Content="刷新"
+                                HorizontalAlignment="Right" Margin="0,-6,0,0" Click="BtnRefresh_Click"/>
+                    </Grid>
+                    <ItemsControl x:Name="DisplayList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource BrushCard2}" CornerRadius="8"
+                                        Padding="12,9" Margin="0,0,0,7">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE7F4;" FontFamily="{StaticResource FontGlyphs}" FontSize="14"
+                                                       VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource BrushAccent}"/>
+                                            <TextBlock Text="{Binding ShortName}" Style="{StaticResource Body}"
+                                                       VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Resolution}" Style="{StaticResource Sub}"
+                                                       VerticalAlignment="Center" Margin="10,1,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Border CornerRadius="5" Padding="7,2" Margin="4,0,0,0"
+                                                    Background="#268B7CFF" Visibility="{Binding IsVirtual, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="虚拟屏" FontSize="11" Foreground="{StaticResource BrushAccent}"/>
+                                            </Border>
+                                            <Border CornerRadius="5" Padding="7,2" Margin="4,0,0,0"
+                                                    Background="#263DD68C" Visibility="{Binding Primary, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="主屏" FontSize="11" Foreground="{StaticResource BrushGreen}"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- 快捷操作 -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <Grid Margin="0,0,0,12">
+                        <TextBlock Text="快捷操作" Style="{StaticResource H2}"/>
+                        <TextBlock x:Name="ModeText" Style="{StaticResource Sub}" HorizontalAlignment="Right"
+                                   Margin="0,2,0,0" Text="当前模式: —"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="BtnOneClick" Grid.Column="0" Style="{StaticResource BtnPrimary}" FontSize="14"
+                                Padding="0,14" Content="一键息屏远控" Click="BtnOneClick_Click"/>
+                        <Button x:Name="BtnRestore" Grid.Column="2" Style="{StaticResource BtnDark}" FontSize="14"
+                                Padding="0,14" Content="恢复内屏" Click="BtnRestore_Click"/>
+                        <Button x:Name="BtnRemoveVdd" Grid.Column="4" Style="{StaticResource BtnDanger}" FontSize="14"
+                                Padding="0,14" Content="移除虚拟屏" Click="BtnRemoveVdd_Click"/>
+                    </Grid>
+                    <TextBlock x:Name="ActionHint" Text="" Style="{StaticResource Sub}" Margin="0,10,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

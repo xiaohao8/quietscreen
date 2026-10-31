@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  IgnorableNamespaces="uap uap10 rescap desktop">
+
+  <!-- 身份信息: 上架前必须替换为微软合作中心 (Partner Center) 分配的
+       Package/Identity Name 与 Publisher (应用管理页 > 应用标识)。
+       本地测试可用默认占位值。 -->
+  <Identity Name="__IDENTITY_NAME__"
+            Publisher="__PUBLISHER__"
+            Version="__VERSION__"
+            ProcessorArchitecture="x64"/>
+
+  <Properties>
+    <DisplayName>Quiet 屏息</DisplayName>
+    <PublisherDisplayName>__PUBLISHER_DISPLAY_NAME__</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <uap10:AllowExternalContent>false</uap10:AllowExternalContent>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0"/>
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="zh-cn"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="QuietScreen.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+          DisplayName="Quiet 屏息"
+          Description="虚拟屏守护与息屏远控工具: 创建 Parsec 虚拟屏、维持主屏、熄灭内屏、守护远控代理。"
+          BackgroundColor="#17171F"
+          Square150x150Logo="Assets\Square150x150Logo.png"
+          Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" ShortName="QuietScreen"/>
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- 开机自启动 (系统 > 应用 > 启动 可管理) -->
+        <desktop:Extension Category="windows.startupTask">
+          <desktop:StartupTask TaskId="QuietScreenStartup" Enabled="false" DisplayName="Quiet 屏息"/>
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- 桌面桥应用: 完整 Win32 权限 (控制已安装的虚拟屏驱动所必需) -->
+    <rescap:Capability Name="runFullTrust"/>
+  </Capabilities>
+</Package>

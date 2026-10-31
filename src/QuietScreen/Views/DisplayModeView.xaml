@@ -1,0 +1,60 @@
+<UserControl x:Class="QuietScreen.Views.DisplayModeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="切换显示模式" Style="{StaticResource H2}" Margin="0,0,0,4"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,0,0,14"
+                               Text="等效 Win+P。" />
+                    <UniformGrid Columns="2" Rows="2">
+                        <Button x:Name="BtnInternal" Style="{StaticResource BtnDark}" Margin="0,0,10,10" Padding="0,16"
+                                Click="Mode_Click" Tag="internal">
+                            <StackPanel>
+                                <TextBlock Text="仅电脑屏幕" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="只点亮内屏" FontSize="11" Foreground="{StaticResource BrushSub}" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnExternal" Style="{StaticResource BtnDark}" Margin="10,0,0,10" Padding="0,16"
+                                Click="Mode_Click" Tag="external">
+                            <StackPanel>
+                                <TextBlock Text="仅第二屏幕" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="内屏熄灭, 只用虚拟屏" FontSize="11" Foreground="{StaticResource BrushSub}" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnExtend" Style="{StaticResource BtnDark}" Margin="0,0,10,0" Padding="0,16"
+                                Click="Mode_Click" Tag="extend">
+                            <StackPanel>
+                                <TextBlock Text="扩展这些显示器" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="内屏和虚拟屏同时亮" FontSize="11" Foreground="{StaticResource BrushSub}" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnClone" Style="{StaticResource BtnDark}" Margin="10,0,0,0" Padding="0,16"
+                                Click="Mode_Click" Tag="clone">
+                            <StackPanel>
+                                <TextBlock Text="复制这些显示器" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="两个屏显示相同内容" FontSize="11" Foreground="{StaticResource BrushSub}" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Button>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="系统显示设置" Style="{StaticResource H2}"/>
+                        <TextBlock Text="调整分辨率、排列、缩放等 (ms-settings:display)" Style="{StaticResource Sub}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Button Style="{StaticResource BtnDark}" Content="打开设置"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Click="BtnOpenDisplaySettings_Click"/>
+                </Grid>
+            </Border>
+
+            <TextBlock Text="提示: 切换模式会瞬间黑屏一下, 属正常现象。" Style="{StaticResource Sub}"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

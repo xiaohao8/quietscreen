@@ -1,0 +1,160 @@
+<Window x:Class="QuietScreen.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="QuietScreen 虚拟屏管家" Width="980" Height="660"
+        MinWidth="860" MinHeight="580"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource BrushBg}"
+        Icon="Assets/app.ico">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="46" ResizeBorderThickness="6"
+                            GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="WinBtn" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushSub}"/>
+            <Setter Property="FontFamily" Value="{StaticResource FontGlyphs}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}">
+                            <TextBlock Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}"
+                                       FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#22808088"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="WinBtnClose" TargetType="Button" BasedOn="{StaticResource WinBtn}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}">
+                            <TextBlock Text="{TemplateBinding Content}" FontFamily="{TemplateBinding FontFamily}"
+                                       FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#C8E81123"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="218"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ============ 左侧导航 ============ -->
+        <Border Grid.Column="0" Background="{StaticResource BrushNav}" BorderBrush="{StaticResource BrushLine}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="46"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="1" Margin="12,10,12,6">
+                    <RadioButton x:Name="NavHome" Style="{StaticResource NavItem}" GroupName="nav" IsChecked="True"
+                                 Checked="Nav_Click" Tag="Home">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE80F;"/>
+                            <TextBlock Text="主页" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavGuardian" Style="{StaticResource NavItem}" GroupName="nav"
+                                 Checked="Nav_Click" Tag="Guardian">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE72E;"/>
+                            <TextBlock Text="守护" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavShutdown" Style="{StaticResource NavItem}" GroupName="nav"
+                                 Checked="Nav_Click" Tag="Shutdown">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE823;"/>
+                            <TextBlock Text="定时关机" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavDisplay" Style="{StaticResource NavItem}" GroupName="nav"
+                                 Checked="Nav_Click" Tag="DisplayMode">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE7F4;"/>
+                            <TextBlock Text="显示模式" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavSettings" Style="{StaticResource NavItem}" GroupName="nav"
+                                 Checked="Nav_Click" Tag="Settings">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE713;"/>
+                            <TextBlock Text="设置" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavLog" Style="{StaticResource NavItem}" GroupName="nav"
+                                 Checked="Nav_Click" Tag="Log">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource NavGlyph}" Text="&#xE7C3;"/>
+                            <TextBlock Text="日志" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+
+                <!-- 底部守护状态 -->
+                <Border Grid.Row="2" VerticalAlignment="Bottom" Margin="12,0,12,14" Padding="12,10"
+                        Background="{StaticResource BrushCard}" CornerRadius="10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <Ellipse x:Name="StatusDot" Width="9" Height="9" Fill="{StaticResource BrushGreen}"
+                                     VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock x:Name="GuardStateText" Text="守护运行中" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushText}"/>
+                        </StackPanel>
+                        <TextBlock x:Name="GuardDetailText" Text="—" FontSize="11" Foreground="{StaticResource BrushSub}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ============ 右侧内容 ============ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="46"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 标题栏 -->
+            <Grid Grid.Row="0" Background="Transparent">
+                <TextBlock x:Name="PageTitle" Text="主页" FontSize="14" FontWeight="SemiBold"
+                           Foreground="{StaticResource BrushText}" VerticalAlignment="Center" Margin="22,0,0,0"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Style="{StaticResource WinBtn}" Click="BtnMin_Click" Content="&#xE921;"/>
+                    <Button Style="{StaticResource WinBtnClose}" Click="BtnClose_Click" Content="&#xE8BB;"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- 页面容器 -->
+            <ContentControl x:Name="PageHost" Grid.Row="1" Margin="22,0,22,16"/>
+        </Grid>
+    </Grid>
+</Window>
