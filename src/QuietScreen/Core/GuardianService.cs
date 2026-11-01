@@ -36,7 +36,6 @@ namespace QuietScreen.Core
     {
         public static GuardianService Instance { get; } = new GuardianService();
 
-        private const int LOCAL_TO_NIGHT_IDLE_SEC = 1800;   // 本机闲置 30 分钟 → 自动息屏远控
 
         private volatile bool _running;
         private volatile OperatingMode _mode = OperatingMode.Local;
@@ -161,14 +160,6 @@ namespace QuietScreen.Core
                     await CheckAsync(firstRun);
                     firstRun = false;
 
-                    // 本机模式闲置 30 分钟 → 自动进入夜间远控 (忘切也不怕)
-                    if (_mode == OperatingMode.Local)
-                    {
-                        uint idle = IdleSeconds();
-                        if (idle >= LOCAL_TO_NIGHT_IDLE_SEC)
-                            SetNight($"本机闲置 {idle / 60} 分钟, 自动息屏远控");
-                    }
-
                     await Task.Delay(interval, token);
                 }
                 catch (OperationCanceledException) { break; }
@@ -216,7 +207,7 @@ namespace QuietScreen.Core
                 else
                 {
                     // ---- 本机模式: 不碰拓扑, 只解除防误触 ----
-                    checkText = $"本机模式: 内屏使用中, 闲置 {LOCAL_TO_NIGHT_IDLE_SEC / 60} 分钟后自动息屏远控";
+                    checkText = "本机模式: 内屏使用中";
                 }
 
                 // ---- 关闭旧版工具 (其自动重加屏与本程序抢屏) ----
@@ -343,27 +334,6 @@ namespace QuietScreen.Core
             return "虚拟屏恢复失败, 请重启电脑后重试";
         }
 
-        // ---- 物理输入检测 (本机模式闲置 → 夜间) ----
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern bool GetLastInputInfo(ref LASTINPUTINFO plii);
-
-        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-        private struct LASTINPUTINFO
-        {
-            public uint cbSize;
-            public uint dwTime;
-        }
-
-        private static uint IdleSeconds()
-        {
-            try
-            {
-                var li = new LASTINPUTINFO { cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf<LASTINPUTINFO>() };
-                if (!GetLastInputInfo(ref li)) return uint.MaxValue;
-                return ((uint)Environment.TickCount - li.dwTime) / 1000;
-            }
-            catch { return uint.MaxValue; }
-        }
 
         private void RaiseChanged()
         {

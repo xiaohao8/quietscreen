@@ -11,7 +11,7 @@ Quiet 让 Windows 笔记本常驻一块虚拟显示器：离开时一键息屏�
 ## Features · 特性
 
 - **常驻虚拟屏** — one virtual display kept alive by a 100 ms driver heartbeat; mode switching is pure topology change (instant)
-- **双模式状态机** — Local（本机：内屏点亮，程序不干扰）/ Night（夜间远控：内屏断电 + 防误触）+ 本机闲置 30 分钟自动进入夜间
+- **双模式状态机** — Local（本机：内屏点亮，程序不干扰）/ Night（夜间远控：内屏断电 + 防误触）+ 手动切换（无自动切换）
 - **秒级切换** — `Ctrl+Alt+Esc` 息屏远控 / `Ctrl+Esc` 点亮内屏
 - **远控代理守护** — keeps Sunlogin (向日葵) agent alive; auto-restarts on failure
 - **每日定时关机** — daily scheduled shutdown with system countdown and one-click cancel

@@ -81,8 +81,9 @@ namespace QuietScreen
 
             // 守护服务
             GuardianService.Instance.Initialize();
-            if (AppConfig.Current.GuardianEnabled)
-                GuardianService.Instance.Start();
+            // 启动即进入本机模式: 开机必亮内屏 (夜间只在你明确按键时进入)
+            GuardianService.Instance.Start();
+            GuardianService.Instance.SetLocal("程序启动", switchDisplay: true);
 
             bool startMinimized = args.Any(a => a == "--minimized");
             var win = new MainWindow(startMinimized);
