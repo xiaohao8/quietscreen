@@ -98,7 +98,7 @@ namespace QuietScreen.Views
                 GuardianService.Instance.SetNight("主页一键息屏");   // 模式切换 (创建/复用/切换/键盘灯全含)
                 await Task.Delay(300);
                 Refresh();
-                ActionHint.Text = "已进入夜间远控模式。回到本机点\"恢复内屏\"或按住 Ctrl+Esc 1 秒。";
+                ActionHint.Text = "已进入夜间远控模式。回到本机点\"恢复内屏\"或按 Ctrl+Esc。";
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace QuietScreen.Views
         private void BtnRestore_Click(object sender, RoutedEventArgs e)
         {
             GuardianService.Instance.SetLocal("主页恢复内屏");
-            ActionHint.Text = "已点亮内屏, 守护暂停 2 小时 (不会被自动切回息屏)。离开时按 Ctrl+Alt+Esc 恢复。";
+            ActionHint.Text = "已点亮内屏。离开时按 Ctrl+Alt+Esc 息屏远控。";
         }
 
         private async void BtnRemoveVdd_Click(object sender, RoutedEventArgs e)

@@ -23,15 +23,16 @@ namespace QuietScreen.Core
         public int ToastOnOkEvery { get; set; } = 0;
 
         // ---- 虚拟屏驱动 ----
-        public string VddExePath { get; set; } = @"D:\ParsecVDisplay\ParsecVDisplay.exe";
+        /// <summary>旧版 ParsecVDisplay 路径 (仅兼容旧配置; 新版本不使用)</summary>
+        public string VddExePath { get; set; } = "";
         /// <summary>虚拟屏设备名正则, 例如 \\.\DISPLAY29</summary>
         public string VirtualDisplayPattern { get; set; } = @"^DISPLAY([2-9]\d)$";
 
-        // ---- 远控代理守护 (向日葵等) ----
-        public bool AgentKeepaliveEnabled { get; set; } = true;
-        public string AgentExe { get; set; } = @"D:\AweSun\agent\AweSun.exe";
-        public string AgentArgs { get; set; } = "--mod=desktopagent --port=49671 --agentid=1 --lockscreen=1 --precreate=1";
-        public int AgentPort { get; set; } = 49671;
+        // ---- 远控代理守护 (可选, 默认关闭, 由用户自行配置) ----
+        public bool AgentKeepaliveEnabled { get; set; } = false;
+        public string AgentExe { get; set; } = "";
+        public string AgentArgs { get; set; } = "";
+        public int AgentPort { get; set; } = 0;
 
         // ---- 自启动 ----
         public bool AutoStartEnabled { get; set; } = false;
@@ -52,8 +53,8 @@ namespace QuietScreen.Core
 
 
         // ---- 旧版工具 ----
-        /// <summary>自动关闭旧版 ParsecVDisplay (它的自动重加屏与本程序的守护冲突)</summary>
-        public bool CloseLegacyToolEnabled { get; set; } = true;
+        /// <summary>自动关闭旧版 ParsecVDisplay (默认关闭, 避免误杀用户正在使用的程序)</summary>
+        public bool CloseLegacyToolEnabled { get; set; } = false;
 
         [JsonIgnore]
         public static AppConfig Current { get; private set; } = new AppConfig();

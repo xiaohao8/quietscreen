@@ -37,6 +37,12 @@ namespace QuietScreen.Core
         private static IntPtr _hwnd;
         private static HwndSource _source;
 
+        // 动作队列: LL 钩子回调必须微秒级返回, 重活由专职线程执行
+        internal enum Hotkey { Local, External }
+        private static readonly System.Collections.Concurrent.BlockingCollection<Hotkey> ActionQueue =
+            new System.Collections.Concurrent.BlockingCollection<Hotkey>(64);
+        private static Thread _actionWorker;
+
         private static IntPtr _hook;
         private static LowLevelKeyboardProc _hookProc;
         private const int WH_KEYBOARD_LL = 13;
@@ -97,6 +103,7 @@ namespace QuietScreen.Core
 
                 InternalRegistered = RegisterHotKey(_hwnd, ID_INTERNAL, MOD_CONTROL | MOD_NOREPEAT, VK_ESCAPE);
                 ExternalRegistered = RegisterHotKey(_hwnd, ID_EXTERNAL, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, VK_ESCAPE);
+                StartActionWorker();
 
                 // Ctrl+Esc 被系统占用时降级为键盘钩子 (装在主线程, WPF 消息泵即可驱动)
                 if (!InternalRegistered) InstallHook();
@@ -128,12 +135,27 @@ namespace QuietScreen.Core
 
         // ---------------- RegisterHotKey 消息路径 ----------------
 
+        private static void StartActionWorker()
+        {
+            if (_actionWorker != null) return;
+            _actionWorker = new Thread(() =>
+            {
+                foreach (var action in ActionQueue.GetConsumingEnumerable())
+                {
+                    try { DispatchAction(action == Hotkey.Local ? ID_INTERNAL : ID_EXTERNAL); }
+                    catch (Exception ex) { Logger.Error("热键动作执行失败: " + ex.Message); }
+                }
+            })
+            { IsBackground = true, Name = "QuietHotkeyActions" };
+            _actionWorker.Start();
+        }
+
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg != WM_HOTKEY) return IntPtr.Zero;
             handled = true;
             int id = wParam.ToInt32();
-            DispatchAction(id);
+            ActionQueue.Add(id == ID_INTERNAL ? Hotkey.Local : Hotkey.External);
             return IntPtr.Zero;
         }
 
@@ -165,7 +187,7 @@ namespace QuietScreen.Core
                 {
                     // Ctrl+Esc → 点亮内屏, 吞掉按键 (不打开开始菜单)
                     InternalRegistered = true;
-                    DispatchAction(ID_INTERNAL);
+                    ActionQueue.Add(Hotkey.Local);   // 钩子回调只入队, 微秒级返回
                     return new IntPtr(1);
                 }
             }
@@ -184,11 +206,11 @@ namespace QuietScreen.Core
                 {
                     if (id == ID_INTERNAL)
                     {
-                        GuardianService.Instance.SetLocal("热键 Ctrl+Esc");
+                        ActionQueue.Add(QuietScreen.Core.HotkeyService.Hotkey.Local);
                     }
                     else if (id == ID_EXTERNAL)
                     {
-                        GuardianService.Instance.SetNight("热键 Ctrl+Alt+Esc");
+                        ActionQueue.Add(QuietScreen.Core.HotkeyService.Hotkey.External);
                     }
                 }
                 catch (Exception ex)

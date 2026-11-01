@@ -79,11 +79,15 @@ namespace QuietScreen
             }) { IsBackground = true };
             listener.Start();
 
+            // 诊断: 打印实际路径
+            Console.WriteLine("DIAG-ConfigDir: " + AppConfig.ConfigDir);
+            Console.WriteLine("DIAG-LogFile: " + Logger.LogFile);
+
             // 守护服务
             GuardianService.Instance.Initialize();
-            // 启动即进入本机模式: 开机必亮内屏 (夜间只在你明确按键时进入)
+            // 启动即进入本机模式: 不主动改显示拓扑 (外接屏用户不会被强制切成仅内屏)
             GuardianService.Instance.Start();
-            GuardianService.Instance.SetLocal("程序启动", switchDisplay: true);
+            GuardianService.Instance.SetLocal("程序启动", switchDisplay: false);
 
             bool startMinimized = args.Any(a => a == "--minimized");
             var win = new MainWindow(startMinimized);

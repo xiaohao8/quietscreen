@@ -39,14 +39,10 @@ namespace QuietScreen.Core
 
             var oneClick = new WinForms.ToolStripMenuItem("一键息屏远控");
             oneClick.Click += (s, e) => RunOnUi(() =>
-            {
-                GuardianService.Instance.Start();
-                GuardianService.Instance.CheckNow();
-                _ = System.Threading.Tasks.Task.Run(() => Logger.Info("键盘灯: " + KeyboardLightService.TrySoftwareLightsOff().Message));
-            });
+                GuardianService.Instance.SetNight("托盘一键息屏"));
             _menu.Items.Add(oneClick);
 
-            var restore = new WinForms.ToolStripMenuItem("恢复内屏 (守护暂停 2 小时)");
+            var restore = new WinForms.ToolStripMenuItem("恢复内屏");
             restore.Click += (s, e) => RunOnUi(() =>
             {
                 GuardianService.Instance.SetLocal("托盘恢复内屏");

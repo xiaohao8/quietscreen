@@ -31,12 +31,29 @@ namespace QuietScreen.Core
             }
             catch (Exception ex) { Check("配置加载", false, ex.Message); }
 
-            // 2. 日志
+            // 2. 日志 (写 MARKER -> 轮询读回验证真正落盘; 写入线程是异步的, 最多等 2 秒)
             try
             {
                 Logger.Init();
-                Logger.Info("自检开始");
-                Check("日志写入", System.IO.File.Exists(Logger.LogFile), Logger.LogFile);
+                Logger.Info("MARKER-QUIET-SELFTEST");
+                bool found = false;
+                for (int i = 0; i < 40 && !found; i++)
+                {
+                    System.Threading.Thread.Sleep(50);
+                    found = System.IO.File.ReadAllText(Logger.LogFile).Contains("MARKER-QUIET-SELFTEST");
+                }
+                string detail = Logger.LogFile;
+                if (!found && !System.IO.File.Exists(Logger.LogFile + ".alt"))
+                    detail += " (若持续失败: 检查杀软/HIPS 是否拦截本程序写入)";
+                Check("日志写入(读回验证)", found, detail);
+
+                // 路径逐字符编码 (与外部工具对照用)
+                var codes = string.Join(" ", Logger.LogFile.Select(c => ((int)c).ToString("X4")));
+                Console.WriteLine("PATH-CODES: " + codes);
+                var fi = new System.IO.FileInfo(Logger.LogFile);
+                Console.WriteLine($"FILE-VIEW: lastwrite={fi.LastWriteTime:yyyy-MM-dd HH:mm:ss} size={fi.Length}");
+                var tail = System.IO.File.ReadAllLines(Logger.LogFile);
+                Console.WriteLine("FILE-TAIL: " + string.Join(" | ", tail.Skip(Math.Max(0, tail.Length - 3))));
             }
             catch (Exception ex) { Check("日志写入", false, ex.Message); }
 

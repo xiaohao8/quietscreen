@@ -26,11 +26,11 @@ namespace QuietScreen.Core
     /// <summary>
     /// 守护服务 —— 双模式状态机:
     ///
-    ///   本机模式 (Local): 内屏正常使用, 程序不碰显示拓扑; 只保活远控代理; 防误触解除。
-    ///   夜间远控 (Night): 虚拟屏为主屏 + 内屏断电 + 防误触布防 + 心跳保活 + 代理守护。
+    ///   本机模式 (Local): 内屏正常使用, 程序不碰显示拓扑; 只保活可选的远控代理。
+    ///   夜间远控 (Night): 虚拟屏为主屏 + 内屏断电 + 心跳保活 + 可选代理守护。
     ///
-    /// 进入夜间: 热键 Ctrl+Alt+Esc / 托盘·主页一键息屏 / 本机闲置 30 分钟自动。
-    /// 回到本机: 按住 Ctrl+Esc 1 秒 (防误触唤醒) / 热键 Ctrl+Esc / 托盘·主页恢复内屏。
+    /// 进入夜间: 热键 Ctrl+Alt+Esc / 托盘·主页一键息屏 (仅手动)。
+    /// 回到本机: 热键 Ctrl+Esc / 托盘·主页恢复内屏。
     /// </summary>
     public sealed class GuardianService
     {
@@ -206,8 +206,14 @@ namespace QuietScreen.Core
                 }
                 else
                 {
-                    // ---- 本机模式: 不碰拓扑, 只解除防误触 ----
+                    // ---- 本机模式: 不碰拓扑, 但清掉多余的虚拟屏 (夜间模式才需要它们) ----
                     checkText = "本机模式: 内屏使用中";
+                    try
+                    {
+                        if (VddDisplay.GetParsecDisplays().Count > 0)
+                            VddService.RemoveAllVirtualDisplays();
+                    }
+                    catch { }
                 }
 
                 // ---- 关闭旧版工具 (其自动重加屏与本程序抢屏) ----

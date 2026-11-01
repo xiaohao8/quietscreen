@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 # QuietScreen MSIX 打包脚本 (微软商店上架用)
 #
 # 用法:
@@ -50,6 +50,14 @@ New-Item -ItemType Directory -Path (Join-Path $Layout 'Assets') -Force | Out-Nul
 Copy-Item "$PublishDir\*" $Layout -Recurse -Force
 Copy-Item (Join-Path $PackDir 'assets\*.png') (Join-Path $Layout 'Assets') -Force
 
+# 许可证 / 第三方声明随包分发 (MIT 与移植代码的署名要求)
+foreach ($legal in @('LICENSE', 'THIRD-PARTY-NOTICES.md')) {
+    $src = Join-Path $Root $legal
+    if (Test-Path $src) { Copy-Item $src (Join-Path $Layout $legal) -Force }
+}
+$parsecLicense = Join-Path $PackDir 'LICENSE-parsec-vdd.txt'
+if (Test-Path $parsecLicense) { Copy-Item $parsecLicense (Join-Path $Layout 'LICENSE-parsec-vdd.txt') -Force }
+
 # 生成清单 (替换占位符)
 $manifest = Get-Content (Join-Path $PackDir 'AppxManifest.template.xml') -Raw -Encoding UTF8
 $manifest = $manifest.Replace('__IDENTITY_NAME__', $IdentityName)
@@ -76,27 +84,44 @@ if ($LASTEXITCODE -ne 0) { throw "makeappx 失败" }
 # ---------- 4. 签名 ----------
 if (-not $NoSign) {
     Write-Host "[4/5] 自签名 (仅本机测试用; 商店会重新签名)..." -ForegroundColor Yellow
-    # 每次生成全新测试证书 (避免旧证书密码混乱)
-    $cert = New-SelfSignedCertificate -Type Custom -Subject $Publisher -KeyUsage DigitalSignature -FriendlyName "QuietScreen test cert" -CertStoreLocation "Cert:\CurrentUser\My" -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}')
-    if (-not $cert) {
+    $pfx = Join-Path $BuildDir 'quietscreen-test.pfx'
+    $cerPath = Join-Path $OutDir 'QuietScreen-Test.cer'
+    Remove-Item $pfx, $cerPath -Force -ErrorAction SilentlyContinue
+
+    # 用 Python 生成 PFX: 不写系统证书存储, 避免受限环境下的 NTE_PERM
+    $certPy = Join-Path $PackDir 'make-test-cert.py'
+    $made = $false
+    if ((Get-Command python -ErrorAction SilentlyContinue) -and (Test-Path $certPy)) {
+        python $certPy --subject $Publisher --pfx $pfx --cer $cerPath --password vddkeeper
+        if ($LASTEXITCODE -eq 0) { $made = $true }
+    }
+    if (-not $made) {
+        Write-Host "  Python 证书生成不可用, 回退到 New-SelfSignedCertificate..." -ForegroundColor Yellow
         $cert = New-SelfSignedCertificate -Type Custom -Subject $Publisher `
-            -KeyUsage DigitalSignature -FriendlyName "QuietScreen Test" `
+            -KeyUsage DigitalSignature -FriendlyName "QuietScreen test cert" `
             -CertStoreLocation "Cert:\CurrentUser\My" `
             -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}')
-        Write-Host "  已创建自签证书: $($cert.Thumbprint)"
+        [System.IO.File]::WriteAllBytes($pfx, $cert.Export('Pfx', 'vddkeeper'))
+        [System.IO.File]::WriteAllBytes($cerPath, $cert.Export('Cert'))
     }
-    $pfx = Join-Path $BuildDir 'quietscreen-test.pfx'
-    $pwdBytes = [System.Text.Encoding]::Unicode.GetBytes('vddkeeper')
-    [System.IO.File]::WriteAllBytes($pfx, $cert.Export('Pfx', 'vddkeeper'))
+
     & $signtool sign /fd SHA256 /a /f $pfx /p vddkeeper $msix
-    if ($LASTEXITCODE -ne 0) { throw "签名失败" }
-    # 导出 .cer 供安装时信任
-    $cerPath = Join-Path $OutDir 'QuietScreen-Test.cer'
-    [System.IO.File]::WriteAllBytes($cerPath, $cert.Export('Cert'))
+    if ($LASTEXITCODE -ne 0) {
+        throw "签名失败。若当前会话无法访问证书存储 (NTE_PERM/0x80090010)，请改用 -NoSign 生成商店上传包（Partner Center 会重新签名），或在普通桌面会话中运行本脚本做本机测试签名。"
+    }
     Write-Host "  证书已导出: $cerPath"
 } else {
     Write-Host "[4/5] 跳过签名 (-NoSign)" -ForegroundColor Yellow
 }
+
+# ---------- 4.5 商店上传包 (.msixupload = 内含 .msix 的 zip) ----------
+$upload = Join-Path $OutDir ("QuietScreen_{0}_x64.msixupload" -f $Version)
+if (Test-Path $upload) { Remove-Item $upload -Force }
+$zipTmp = Join-Path $OutDir ("QuietScreen_{0}_x64.msixupload.zip" -f $Version)
+if (Test-Path $zipTmp) { Remove-Item $zipTmp -Force }
+Compress-Archive -Path $msix -DestinationPath $zipTmp -CompressionLevel Optimal
+Move-Item $zipTmp $upload -Force
+Write-Host "  已生成商店上传包: $upload"
 
 # ---------- 5. 可选: 本机安装 ----------
 if ($Install) {
@@ -116,5 +141,6 @@ if ($Install) {
 Write-Host ""
 Write-Host "== 完成 ==" -ForegroundColor Green
 Write-Host "安装包: $msix"
+Write-Host "上传包: $upload"
 Write-Host "  本机安装 : powershell -File build-store.ps1 -Install"
-Write-Host "  商店上传 : Partner Center > 应用 > 软件包, 上传此 .msix (身份需与 PC 一致)"
+Write-Host "  商店上传 : Partner Center > 应用 > 软件包, 上传 .msixupload (身份需与 PC 一致)"

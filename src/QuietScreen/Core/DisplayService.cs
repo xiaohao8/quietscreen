@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using QuietScreen.Core.Vdd;
@@ -94,9 +95,45 @@ namespace QuietScreen.Core
         // ---------------- 拓扑切换 ----------------
         public enum Topology { InternalOnly, ExternalOnly, Extend, Duplicate }
 
-        /// <summary>调用系统 DisplaySwitch 切换显示模式 (与旧脚本同一路径, 稳定可靠)</summary>
+        // ---- Windows 显示拓扑 API (DisplaySwitch.exe 的底层实现, 不依赖外部进程) ----
+        [DllImport("user32.dll")]
+        private static extern int SetDisplayConfig(uint numPathArrayElements, uint[] pathArray, uint numModeArrayElements, uint[] modeArray, uint flags);
+
+        private const uint SDC_TOPOLOGY_INTERNAL = 0x00000001;
+        private const uint SDC_TOPOLOGY_EXTERNAL = 0x00000002;
+        private const uint SDC_TOPOLOGY_CLONE = 0x00000004;
+        private const uint SDC_TOPOLOGY_EXTEND = 0x00000008;
+        private const uint SDC_ALLOW_CHANGES = 0x00000040;
+
+        /// <summary>纯拓扑切换 (等价 DisplaySwitch 的四个按钮), 返回是否成功</summary>
+        public static bool SetTopology(Topology t)
+        {
+            uint flag = t switch
+            {
+                Topology.InternalOnly => SDC_TOPOLOGY_INTERNAL,
+                Topology.ExternalOnly => SDC_TOPOLOGY_EXTERNAL,
+                Topology.Extend => SDC_TOPOLOGY_EXTEND,
+                Topology.Duplicate => SDC_TOPOLOGY_CLONE,
+                _ => 0
+            };
+            try
+            {
+                // 路径/模式数组传空 = 只改拓扑, 保留各屏分辨率
+                int result = SetDisplayConfig(0, null, 0, null, flag | SDC_ALLOW_CHANGES);
+                return result == 0;   // ERROR_SUCCESS
+            }
+            catch { return false; }
+        }
+
+        /// <summary>切换显示模式: 优先 Windows 拓扑 API (无外部进程), 失败回退 DisplaySwitch.exe</summary>
         public static bool SwitchTo(Topology t)
         {
+            if (SetTopology(t))
+            {
+                Logger.Info($"已切换显示模式: {t} (SetDisplayConfig)");
+                return true;
+            }
+            // API 失败 (罕见): 回退 DisplaySwitch.exe
             string arg = t switch
             {
                 Topology.InternalOnly => "/internal",
@@ -114,7 +151,7 @@ namespace QuietScreen.Core
                     WindowStyle = ProcessWindowStyle.Hidden,
                     UseShellExecute = false
                 });
-                Logger.Info($"已切换显示模式: {t} ({arg})");
+                Logger.Info($"已切换显示模式: {t} (DisplaySwitch)");
                 return true;
             }
             catch (Exception ex)

@@ -101,26 +101,6 @@ namespace QuietScreen.Views
             _ = RefreshDriverAsync();
         }
 
-        private void BtnDrvFolder_Click(object sender, RoutedEventArgs e)
-        {
-            // 常见驱动安装包位置
-            string[] candidates =
-            {
-                @"D:\ParsecVDisplay\driver",
-                @"D:\ParsecVDisplay",
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ParsecVDisplay"),
-            };
-            foreach (var dir in candidates)
-            {
-                if (Directory.Exists(dir))
-                {
-                    Process.Start("explorer.exe", dir);
-                    return;
-                }
-            }
-            ToastService.Show("QuietScreen", "没有找到驱动安装包, 请到项目主页重新下载");
-        }
-
         private void BtnDrvHome_Click(object sender, RoutedEventArgs e)
         {
             try

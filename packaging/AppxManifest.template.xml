@@ -23,7 +23,7 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0"/>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0"/>
   </Dependencies>
 
   <Resources>
@@ -36,7 +36,7 @@
                  EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
           DisplayName="Quiet 屏息"
-          Description="虚拟屏守护与息屏远控工具: 创建 Parsec 虚拟屏、维持主屏、熄灭内屏、守护远控代理。"
+          Description="虚拟屏守护与息屏远控工具: 创建 Parsec 虚拟屏、维持主屏、熄灭内屏、可选代理守护。"
           BackgroundColor="#17171F"
           Square150x150Logo="Assets\Square150x150Logo.png"
           Square44x44Logo="Assets\Square44x44Logo.png">
@@ -45,7 +45,9 @@
 
       <Extensions>
         <!-- 开机自启动 (系统 > 应用 > 启动 可管理) -->
-        <desktop:Extension Category="windows.startupTask">
+        <desktop:Extension Category="windows.startupTask"
+                           Executable="QuietScreen.exe"
+                           EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="QuietScreenStartup" Enabled="false" DisplayName="Quiet 屏息"/>
         </desktop:Extension>
       </Extensions>

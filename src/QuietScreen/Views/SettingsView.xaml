@@ -18,9 +18,7 @@
                     </Grid>
                     <TextBlock x:Name="DrvSub" Style="{StaticResource Sub}" Text="Parsec 虚拟屏驱动"/>
                     <StackPanel x:Name="DrvHelpPanel" Orientation="Horizontal" Margin="0,10,0,0" Visibility="Collapsed">
-                        <Button x:Name="BtnDrvFolder" Style="{StaticResource BtnDark}" Content="打开驱动安装包所在文件夹"
-                                Click="BtnDrvFolder_Click"/>
-                        <Button Style="{StaticResource BtnDark}" Content="打开项目主页" Margin="10,0,0,0"
+                        <Button Style="{StaticResource BtnDark}" Content="打开官方驱动下载页"
                                 Click="BtnDrvHome_Click"/>
                     </StackPanel>
                 </StackPanel>
