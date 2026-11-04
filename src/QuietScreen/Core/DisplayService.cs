@@ -100,10 +100,10 @@ namespace QuietScreen.Core
         private static extern int SetDisplayConfig(uint numPathArrayElements, uint[] pathArray, uint numModeArrayElements, uint[] modeArray, uint flags);
 
         private const uint SDC_TOPOLOGY_INTERNAL = 0x00000001;
-        private const uint SDC_TOPOLOGY_EXTERNAL = 0x00000002;
-        private const uint SDC_TOPOLOGY_CLONE = 0x00000004;
-        private const uint SDC_TOPOLOGY_EXTEND = 0x00000008;
-        private const uint SDC_ALLOW_CHANGES = 0x00000040;
+        private const uint SDC_TOPOLOGY_CLONE = 0x00000002;
+        private const uint SDC_TOPOLOGY_EXTEND = 0x00000004;
+        private const uint SDC_TOPOLOGY_EXTERNAL = 0x00000008;
+        private const uint SDC_ALLOW_CHANGES = 0x00000400;
 
         /// <summary>纯拓扑切换 (等价 DisplaySwitch 的四个按钮), 返回是否成功</summary>
         public static bool SetTopology(Topology t)
