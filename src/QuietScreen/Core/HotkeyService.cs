@@ -205,13 +205,9 @@ namespace QuietScreen.Core
                 try
                 {
                     if (id == ID_INTERNAL)
-                    {
-                        ActionQueue.Add(QuietScreen.Core.HotkeyService.Hotkey.Local);
-                    }
+                        GuardianService.Instance.SetLocal("热键 Ctrl+Esc");
                     else if (id == ID_EXTERNAL)
-                    {
-                        ActionQueue.Add(QuietScreen.Core.HotkeyService.Hotkey.External);
-                    }
+                        GuardianService.Instance.SetNight("热键 Ctrl+Alt+Esc");
                 }
                 catch (Exception ex)
                 {

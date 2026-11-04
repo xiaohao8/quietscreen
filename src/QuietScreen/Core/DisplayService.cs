@@ -103,7 +103,7 @@ namespace QuietScreen.Core
         private const uint SDC_TOPOLOGY_CLONE = 0x00000002;
         private const uint SDC_TOPOLOGY_EXTEND = 0x00000004;
         private const uint SDC_TOPOLOGY_EXTERNAL = 0x00000008;
-        private const uint SDC_ALLOW_CHANGES = 0x00000400;
+        private const uint SDC_APPLY = 0x00000080;
 
         /// <summary>纯拓扑切换 (等价 DisplaySwitch 的四个按钮), 返回是否成功</summary>
         public static bool SetTopology(Topology t)
@@ -119,7 +119,7 @@ namespace QuietScreen.Core
             try
             {
                 // 路径/模式数组传空 = 只改拓扑, 保留各屏分辨率
-                int result = SetDisplayConfig(0, null, 0, null, flag | SDC_ALLOW_CHANGES);
+                int result = SetDisplayConfig(0, null, 0, null, flag | SDC_APPLY);
                 return result == 0;   // ERROR_SUCCESS
             }
             catch { return false; }
