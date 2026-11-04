@@ -28,6 +28,18 @@ namespace QuietScreen
                 return;
             }
 
+            // ---- 修复当前远程虚拟屏的桌面尺寸, 不启动托盘/守护 ----
+            if (args.Length >= 1 && args[0] == "--fix-display")
+            {
+                Logger.Init();
+                AppConfig.Load();
+                var layout = RemoteDisplayService.EnsureLayout();
+                Logger.Info("远程桌面修复结果: " + layout.Message);
+                VddController.Stop();
+                Shutdown(layout.MeetsMinimum ? 0 : 1);
+                return;
+            }
+
             // ---- 单实例 ----
             bool createdNew;
             SingleMutex = new Mutex(true, "Local\\QuietScreen.SingleInstance", out createdNew);
@@ -88,6 +100,8 @@ namespace QuietScreen
             // 启动即进入本机模式: 不主动改显示拓扑 (外接屏用户不会被强制切成仅内屏)
             GuardianService.Instance.Start();
             GuardianService.Instance.SetLocal("程序启动", switchDisplay: false);
+            if (args.Any(a => a == "--night"))
+                GuardianService.Instance.SetNight("命令行 --night");
 
             bool startMinimized = args.Any(a => a == "--minimized");
             var win = new MainWindow(startMinimized);

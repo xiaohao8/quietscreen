@@ -13,6 +13,7 @@ Quiet 让 Windows 笔记本常驻一块虚拟显示器：离开时一键息屏�
 - **常驻虚拟屏** — one virtual display kept alive by a 100 ms driver heartbeat; mode switching is pure topology change (instant)
 - **双模式状态机** — Local（本机：内屏点亮，程序不改拓扑）/ Night（夜间远控：内屏断电）+ 手动切换（无自动切换）
 - **秒级切换** — `Ctrl+Alt+Esc` 息屏远控 / `Ctrl+Esc` 点亮内屏
+- **远程桌面尺寸自动校正** — 夜间模式把常驻虚拟屏固定为 `2560x1600@60`，并校正到 150% 缩放，避免只剩 `1280x800` 导致下半屏内容显示不出来
 - **可选远控代理守护** — 默认关闭；用户自行指定本机远控程序路径，掉线后自动拉起
 - **每日定时关机** — daily scheduled shutdown with system countdown and one-click cancel
 - **防睡眠** — blocks sleep/hibernate/display-timeout while running (restores on exit)
@@ -39,7 +40,7 @@ Quiet 让 Windows 笔记本常驻一块虚拟显示器：离开时一键息屏�
 ```
 
 - **Local**: internal screen on; the app does not touch your display topology; agent keepalive only.
-- **Night**: virtual display active + internal screen powered off; input anti-touch ready; auto-repair if the display drops.
+- **Night**: virtual display active + internal screen powered off; input anti-touch ready; auto-repair if the display drops. The app also repairs the virtual display mode and DPI scale so the remote desktop never falls back to `1280x800`; the minimum target is about `1707x1067` at 150% scale.
 
 The virtual display is kept alive by a heartbeat (`IOCTL_UPDATE` every 100 ms). If the heartbeat stops, the driver watchdog removes it — so on app exit the system returns to a clean state automatically.
 
@@ -55,6 +56,12 @@ dotnet build src/QuietScreen/QuietScreen.csproj -c Release -r win-x64 --self-con
 ```
 
 产物在 `src/QuietScreen/bin/Release/.../win-x64/`，免安装直接运行。
+
+当前远程画面尺寸异常时，也可以手动执行一次修复：
+
+```
+QuietScreen.exe --fix-display
+```
 
 ## 致谢 · Credits
 

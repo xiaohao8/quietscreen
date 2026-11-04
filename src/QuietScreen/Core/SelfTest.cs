@@ -73,6 +73,10 @@ namespace QuietScreen.Core
                 var primary = screens.FirstOrDefault(s => s.Primary);
                 Check("主屏判定", primary != null,
                     primary == null ? "" : $"{primary.ShortName} {primary.Resolution} virtual={primary.IsVirtual}");
+
+                var layout = RemoteDisplayService.GetLayout();
+                Check("远程桌面尺寸", !layout.Success || layout.MeetsMinimum,
+                    layout.Success ? layout.Message : "当前没有虚拟主屏, 跳过");
             }
             catch (Exception ex) { Check("显示器枚举", false, ex.Message); }
 

@@ -64,10 +64,25 @@ namespace QuietScreen.Core
                 CheckCount = (int)Interlocked.Read(ref _checkCount),
                 RepairCount = (int)Interlocked.Read(ref _repairCount),
                 LastCheckText = _lastCheckText,
-                PrimaryText = p == null ? "无显示器" : $"{p.ShortName} {p.Resolution}{(p.IsVirtual ? " (虚拟屏)" : "")}{(p.Primary ? " ·主屏" : "")}",
+                PrimaryText = BuildPrimaryText(p),
                 AgentText = _agentText,
                 LastCheckTime = _lastCheckTime,
             };
+        }
+
+        private static string BuildPrimaryText(DisplayInfo primary)
+        {
+            if (primary == null) return "无显示器";
+            string text = $"{primary.ShortName} {primary.Resolution}" +
+                          $"{(primary.IsVirtual ? " (虚拟屏)" : "")}" +
+                          $"{(primary.Primary ? " ·主屏" : "")}";
+            if (primary.IsVirtual)
+            {
+                var layout = RemoteDisplayService.GetLayout();
+                if (layout.Success)
+                    text += $" · 桌面 {layout.LogicalWidth}x{layout.LogicalHeight}";
+            }
+            return text;
         }
 
         public void Initialize()
@@ -90,6 +105,7 @@ namespace QuietScreen.Core
                 {
                     await VddService.EnsureVirtualDisplayAsync();   // 缺屏才创建 (常驻后跳过)
                     DisplayService.SwitchTo(DisplayService.Topology.ExternalOnly);
+                    await Task.Run(() => RemoteDisplayService.EnsureLayout());
                     var r = KeyboardLightService.TrySoftwareLightsOff();
                     Logger.Info("键盘灯: " + r.Message);
                 }
@@ -200,7 +216,16 @@ namespace QuietScreen.Core
                     }
                     else
                     {
-                        checkText = $"夜间远控中 {primary.ShortName} {primary.Resolution}, 内屏已熄灭";
+                        var layout = RemoteDisplayService.GetLayout();
+                        if (layout.Success && !layout.MeetsMinimum)
+                        {
+                            Interlocked.Increment(ref _repairCount);
+                            layout = await Task.Run(() => RemoteDisplayService.EnsureLayout());
+                            if (layout.Changed)
+                                actions.Add("远程桌面尺寸: " + layout.Message);
+                        }
+                        checkText = $"夜间远控中 {primary.ShortName} {primary.Resolution}, " +
+                                    $"桌面 {layout.LogicalWidth}x{layout.LogicalHeight}, 内屏已熄灭";
                     }
 
                 }
@@ -285,8 +310,9 @@ namespace QuietScreen.Core
                 if (DisplayService.IsPrimaryVirtual())
                 {
                     var cur = DisplayService.GetPrimary();
+                    var layout = RemoteDisplayService.EnsureLayout();
                     Logger.Ok($"复用现有虚拟屏: {cur?.ShortName} {cur?.Resolution}");
-                    return $"虚拟屏已恢复 {cur?.ShortName}, 内屏已熄灭";
+                    return $"虚拟屏已恢复 {cur?.ShortName}, {layout.Message}, 内屏已熄灭";
                 }
             }
 
@@ -318,6 +344,7 @@ namespace QuietScreen.Core
 
                 if (DisplayService.IsPrimaryVirtual())
                 {
+                    RemoteDisplayService.EnsureLayout();
                     Logger.Ok($"虚拟屏恢复成功: {r.ScreenName} {r.Resolution}");
                     return $"虚拟屏已恢复 {r.ScreenName}, 主屏正常";
                 }
@@ -330,6 +357,7 @@ namespace QuietScreen.Core
 
                 if (DisplayService.IsPrimaryVirtual())
                 {
+                    RemoteDisplayService.EnsureLayout();
                     Logger.Ok($"虚拟屏恢复成功并已切换主屏: {r.ScreenName} {r.Resolution}");
                     return $"虚拟屏已恢复 {r.ScreenName}, 内屏已熄灭";
                 }
