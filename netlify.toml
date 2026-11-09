@@ -1,0 +1,24 @@
+# Netlify 配置 · QuietScreen 屏息静态站
+# 仓库根建站：把 Git 仓库连到 Netlify 后会自动读取本文件，只发布 site/ 目录。
+# 纯静态，无需构建命令、无需 npm、无环境变量。
+
+[build]
+  publish = "site"
+
+# 友好短链（正式政策页仍以 /privacy.html 为准，短链只是补充）
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+# 基础安全头
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# 带内容哈希的静态素材可长缓存；本项目图片未加哈希，保持上面短缓存即可。

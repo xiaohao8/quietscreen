@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuietScreen 屏息 · 屏幕熄了，活照干</title>
+  <meta name="description" content="QuietScreen 屏息：给 Windows 笔记本用的息屏远控工具。常驻虚拟显示器，一键把内屏拓扑级断电，任务照跑，远程连回继续干活。完全离线，无遥测。">
+  <meta name="theme-color" content="#111116">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="QuietScreen 屏息 首页">
+      <img src="assets/logo.png" alt="QuietScreen 图标" width="30" height="30">
+      <span class="brand-name">QuietScreen 屏息</span>
+      <span class="brand-sub">Screen off. Work on.</span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="#features">特性</a>
+      <a href="#how">工作原理</a>
+      <a href="#screenshots">界面</a>
+      <a href="#privacy">隐私</a>
+      <a class="nav-cta" href="https://apps.microsoft.com/detail/9NS0H3K7GSP6" rel="noopener">Microsoft Store</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Windows 10 / 11 · x64 · 完全离线</div>
+        <h1>屏幕熄了，<br><span class="accent">活照干。</span></h1>
+        <p class="lede">
+          QuietScreen 屏息让笔记本常驻一块虚拟显示器。离开时一键把内置屏幕从显示拓扑里真正摘掉 —— 不是黑色遮罩，是真断电；任务继续跑，远程连回来看到的依然是一块完整桌面。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9NS0H3K7GSP6" rel="noopener">从 Microsoft Store 获取</a>
+          <a class="btn btn-ghost" href="#how">了解它怎么工作</a>
+        </div>
+        <p class="hero-note">为宿舍息屏远控场景设计 · 无需账号 · 不联网 · 无遥测</p>
+      </div>
+
+      <div class="state-card" aria-label="双模式状态示意">
+        <div class="state-card-head"><span>显示拓扑</span><span>手动切换</span></div>
+        <div class="state-row">
+          <div class="state-icon">◐</div>
+          <div class="state-text"><strong>本机模式 Local</strong><span>内屏点亮 · 程序不改动拓扑</span></div>
+          <span class="state-tag">默认</span>
+        </div>
+        <div class="state-row">
+          <div class="state-icon on">◑</div>
+          <div class="state-text"><strong>夜间远控 Night</strong><span>虚拟屏为主屏 · 内屏断电</span></div>
+          <span class="state-tag on">远控中</span>
+        </div>
+        <div class="state-foot">
+          <code>Ctrl+Alt+Esc</code> 息屏远控 &nbsp;·&nbsp; <code>Ctrl+Esc</code> 点亮内屏
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker">Features</p>
+        <h2>把「离开电脑」这件事做得干净一点</h2>
+        <p class="section-intro">所有切换都由你手动触发，不拦截键鼠，也没有闲置自动息屏。你决定什么时候熄屏。</p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <div class="ico">▣</div>
+          <h3>真熄屏，不是遮罩</h3>
+          <p>把内屏从显示拓扑级摘掉，硬件层面的断电；不靠调暗、不靠黑色窗口覆盖。</p>
+        </article>
+        <article class="feature">
+          <div class="ico">↯</div>
+          <h3>秒级切换</h3>
+          <p>虚拟屏由驱动心跳常驻保活，切换只是一次显示拓扑变化，无需等待建屏。</p>
+        </article>
+        <article class="feature">
+          <div class="ico">⌘</div>
+          <h3>全局热键</h3>
+          <p>Ctrl+Alt+Esc 息屏远控，Ctrl+Esc 点亮内屏；远控客户端注入的按键同样有效。</p>
+        </article>
+        <article class="feature">
+          <div class="ico">◇</div>
+          <h3>远程画面自动校正</h3>
+          <p>夜间模式把虚拟屏固定为 2560×1600@60 并校正缩放，避免远控只剩 1280×800。</p>
+        </article>
+        <article class="feature">
+          <div class="ico">↻</div>
+          <h3>守护巡检</h3>
+          <p>虚拟屏掉线自动恢复；远控代理（路径由你指定，默认关闭）掉线后自动拉起。</p>
+        </article>
+        <article class="feature">
+          <div class="ico">◷</div>
+          <h3>定时关机与防睡眠</h3>
+          <p>每日定时关机交给系统倒计时、可一键取消；运行期间阻止自动睡眠，退出即恢复。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker">How it works</p>
+        <h2>两种模式，一次按键的距离</h2>
+        <p class="section-intro">虚拟显示器始终在后台常驻，模式切换只是决定「哪块屏在主屏位置」。</p>
+      </div>
+
+      <div class="modes">
+        <article class="mode">
+          <span class="mode-label">LOCAL · 本机</span>
+          <h3>内屏点亮，正常使用</h3>
+          <p>回到电脑前，一切照旧。</p>
+          <ul>
+            <li>程序不改动你的显示拓扑，外接屏不受影响</li>
+            <li>虚拟屏在后台保活，不占桌面</li>
+            <li>键盘灯恢复，守护仍按配置巡检</li>
+          </ul>
+        </article>
+
+        <div class="mode-arrow" aria-hidden="true">⇄</div>
+
+        <article class="mode is-night">
+          <span class="mode-label">NIGHT · 夜间远控</span>
+          <h3>内屏断电，桌面留给远控</h3>
+          <p>合盖走人，任务照跑。</p>
+          <ul>
+            <li>虚拟屏激活为主屏，远程画面走它</li>
+            <li>内屏从拓扑移除，物理上真正熄灭</li>
+            <li>可选远控代理守护，掉线自动拉起</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="hotkeys">
+        <span><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Esc</kbd> 息屏远控</span>
+        <span><kbd>Ctrl</kbd> + <kbd>Esc</kbd> 点亮内屏</span>
+      </div>
+      <p class="hero-note">注册后 Ctrl+Esc 不再打开开始菜单，开始菜单请用 Win 键。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="screenshots">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker">Interface</p>
+        <h2>克制、常驻托盘</h2>
+        <p class="section-intro">主页、守护、定时关机、设置与日志，都在一个窗口里。</p>
+      </div>
+      <div class="shots">
+        <figure class="shot">
+          <img src="assets/shot1-home.png" alt="QuietScreen 主页：驱动状态、当前显示器与快捷操作" loading="lazy">
+          <figcaption class="shot-caption">主页 · 驱动状态与一键息屏</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/shot2-guardian.png" alt="QuietScreen 守护页：巡检与代理配置" loading="lazy">
+          <figcaption class="shot-caption">守护 · 巡检与远控代理</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/shot3-shutdown.png" alt="QuietScreen 定时关机页" loading="lazy">
+          <figcaption class="shot-caption">定时关机 · 系统倒计时可取消</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/shot4-settings.png" alt="QuietScreen 设置页" loading="lazy">
+          <figcaption class="shot-caption">设置 · 驱动、热键与配置路径</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="privacy">
+    <div class="wrap">
+      <div class="privacy-band">
+        <div>
+          <p class="section-kicker">Privacy</p>
+          <h2>完全离线，不收集任何数据</h2>
+          <p>没有账号、没有遥测、没有崩溃上报。配置和日志只存在你自己的电脑上，随时可以手动删掉。本站同样只是静态页面：不设 Cookie、不加载第三方脚本。</p>
+          <div class="privacy-points">
+            <span>无联网传输</span><span>无账号系统</span><span>无统计埋点</span><span>无第三方资源</span>
+          </div>
+        </div>
+        <a class="btn btn-ghost" href="privacy.html">阅读隐私政策</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <p class="section-kicker">Requirements</p>
+        <h2>开始前</h2>
+      </div>
+      <div class="reqs">
+        <div class="req"><strong>系统</strong><span>Windows 10（19041+）/ Windows 11，x64</span></div>
+        <div class="req"><strong>虚拟屏驱动</strong><span>首次使用在应用内点「安装驱动」，需确认一次 UAC</span></div>
+        <div class="req"><strong>远控软件</strong><span>自带任意远控工具即可；代理守护为可选项</span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 QuietScreen 屏息 · 发布者 付志豪</span>
+    <div class="footer-links">
+      <a href="privacy.html">隐私政策</a>
+      <a href="https://github.com/xiaohao8/quietscreen" rel="noopener">GitHub</a>
+      <a href="https://apps.microsoft.com/detail/9NS0H3K7GSP6" rel="noopener">Microsoft Store</a>
+      <a href="mailto:vip@mrds.app">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
