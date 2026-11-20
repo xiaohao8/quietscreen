@@ -15,3 +15,7 @@ out/
 .idea/
 build/
 __pycache__/
+
+## 并行会话工作区
+.workbuddy/
+.wbapp*.genie

@@ -20,11 +20,8 @@ namespace QuietScreen.Core
 
         // ---- 通知 ----
         public bool ToastOnChange { get; set; } = true;
-        public int ToastOnOkEvery { get; set; } = 0;
 
         // ---- 虚拟屏驱动 ----
-        /// <summary>旧版 ParsecVDisplay 路径 (仅兼容旧配置; 新版本不使用)</summary>
-        public string VddExePath { get; set; } = "";
         /// <summary>虚拟屏设备名正则, 例如 \\.\DISPLAY29</summary>
         public string VirtualDisplayPattern { get; set; } = @"^DISPLAY([2-9]\d)$";
 
@@ -42,6 +39,14 @@ namespace QuietScreen.Core
         public bool PreventSleepEnabled { get; set; } = true;
         /// <summary>全局热键: Ctrl+Esc 点亮内屏, Ctrl+Alt+Esc 切回息屏</summary>
         public bool HotkeyEnabled { get; set; } = true;
+
+        // ---- 性能模式 (风扇降噪) ----
+        /// <summary>进入夜间远控时自动降档降噪, 回本机自动还原</summary>
+        public bool NightAutoQuietEnabled { get; set; } = false;
+        /// <summary>夜间拯救者档位: 0=野兽 1=均衡 2=安静, -1=不调整</summary>
+        public int NightLegionMode { get; set; } = 2;
+        /// <summary>夜间 Windows 电源档: "efficiency"/"balanced"/"performance"/"none" (默认最佳能效, 运行时解析本机实际 GUID)</summary>
+        public string NightOverlay { get; set; } = "efficiency";
 
         // ---- 定时关机 ----
         /// <summary>每天固定时间自动关机</summary>

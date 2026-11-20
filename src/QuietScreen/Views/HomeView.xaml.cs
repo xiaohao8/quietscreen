@@ -91,14 +91,13 @@ namespace QuietScreen.Views
             if (_busy) return;
             _busy = true;
             SetButtons(false);
-            ActionHint.Text = "正在创建虚拟屏并切换到仅第二屏 (内屏会熄灭)...";
+            ActionHint.Text = "正在进入夜间远控模式 (虚拟屏就绪/切换, 约需数秒)...";
             try
             {
-                var cfg = AppConfig.Current;
                 GuardianService.Instance.SetNight("主页一键息屏");   // 模式切换 (创建/复用/切换/键盘灯全含)
                 await Task.Delay(300);
                 Refresh();
-                ActionHint.Text = "已进入夜间远控模式。回到本机点\"恢复内屏\"或按 Ctrl+Esc。";
+                // SetNight 的创建/切换在后台进行, 完成时机由状态区与通知反馈, 此处不抢答"已进入"
             }
             catch (Exception ex)
             {
@@ -120,6 +119,10 @@ namespace QuietScreen.Views
         private async void BtnRemoveVdd_Click(object sender, RoutedEventArgs e)
         {
             if (_busy) return;
+            // 夜间远控中误点此键会掐断远端画面: 破坏性操作, 先确认
+            if (MessageBox.Show("将移除全部虚拟屏。\n若当前正处于息屏远控, 远端画面会立即中断。\n\n确认移除?",
+                                "移除虚拟屏", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+                != MessageBoxResult.Yes) return;
             _busy = true;
             SetButtons(false);
             ActionHint.Text = "正在移除虚拟屏...";

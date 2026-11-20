@@ -23,7 +23,6 @@ namespace QuietScreen.Core.Vdd
         private static CancellationTokenSource _cts;
         private static IntPtr _handle = IntPtr.Zero;
         private static int _lastStatus = int.MinValue;
-        private static int _activeDisplays;                    // 当前需要心跳保活的虚拟屏数 (0 = 不用 ping)
         private static ManualResetEventSlim _statusKick;
         private static ManualResetEventSlim _handleReady;
         private static volatile bool _suspended;
@@ -167,17 +166,6 @@ namespace QuietScreen.Core.Vdd
             }
         }
 
-        /// <summary>同步"需要保活的虚拟屏数量" (守护巡检用实际枚举结果校准, 防计数漂移)</summary>
-        public static void SyncActiveDisplays(int count)
-        {
-            Volatile.Write(ref _activeDisplays, Math.Max(0, count));
-        }
-
-        private static void OnDisplayAdded() => Interlocked.Increment(ref _activeDisplays);
-
-        private static void OnDisplayRemoved() =>
-            Interlocked.Exchange(ref _activeDisplays, Math.Max(0, Volatile.Read(ref _activeDisplays) - 1));
-
         private static void StatusLoop(CancellationToken cancellation)
         {
             while (!cancellation.IsCancellationRequested)
@@ -223,8 +211,6 @@ namespace QuietScreen.Core.Vdd
                             VddDriver.CloseHandle(handle);
                             Logger.Info($"驱动句柄已关闭 (状态={status})");
                         }
-                        // 驱动失效/离线: 心跳计数清零 (看门狗会拔掉所有虚拟屏, 无可保活)
-                        Volatile.Write(ref _activeDisplays, 0);
                     }
                 }
 
@@ -290,7 +276,6 @@ namespace QuietScreen.Core.Vdd
                 return -1;
             }
 
-            OnDisplayAdded();
             Logger.Info($"虚拟屏已创建, 驱动索引 {index}");
             return index;
         }
@@ -307,7 +292,6 @@ namespace QuietScreen.Core.Vdd
             if (!VddDriver.IsValidHandle(handle)) return false;
             if (VddDriver.RemoveDisplay(handle, index))
             {
-                OnDisplayRemoved();
                 return true;
             }
             return false;
@@ -322,7 +306,6 @@ namespace QuietScreen.Core.Vdd
             {
                 if (RemoveDisplay(displays[i].DriverIndex)) removed++;
             }
-            SyncActiveDisplays(VddDisplay.GetParsecDisplays().Count);
             if (displays.Count > 0)
                 Logger.Info($"移除虚拟屏: {removed}/{displays.Count}");
             return removed;

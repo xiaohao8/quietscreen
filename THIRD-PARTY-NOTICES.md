@@ -1,6 +1,6 @@
 # Third-party notices
 
-Quiet · 屏息 includes or links against the following components.
+QuietScreen 屏息 includes or links against the following components.
 
 ## nomi-san/parsec-vdd
 

@@ -108,6 +108,8 @@ namespace QuietScreen.Core
                     await Task.Run(() => RemoteDisplayService.EnsureLayout());
                     var r = KeyboardLightService.TrySoftwareLightsOff();
                     Logger.Info("键盘灯: " + r.Message);
+                    var pm = await PowerModeService.Instance.ApplyNightPolicyAsync(wasNight);
+                    if (pm != null) Logger.Info(pm);
                 }
                 catch (Exception ex) { Logger.Error("夜间模式切换异常: " + ex.Message); }
             });
@@ -120,6 +122,11 @@ namespace QuietScreen.Core
             _mode = OperatingMode.Local;
             Logger.Info($"进入本机模式 ({reason})");
             if (switchDisplay) DisplayService.SwitchTo(DisplayService.Topology.InternalOnly);
+            // 夜间降噪后回本机: 还原切换前的档位 (无快照则静默跳过)
+            _ = PowerModeService.Instance.RestoreAfterNightAsync().ContinueWith(t =>
+            {
+                if (t.Result != null) Logger.Info(t.Result);
+            });
             RaiseChanged();
         }
 
@@ -132,16 +139,25 @@ namespace QuietScreen.Core
             _cts = new CancellationTokenSource();
             VddService.EnsureStarted();
             var token = _cts.Token;
-            // 常驻单屏: 启动时确保恰好一个虚拟屏存在 (缺失才创建), 心跳终身保活
-            Task.Run(async () =>
+            // 本机模式启动不预建虚拟屏: 避免冷启动"建屏→巡检删屏"两次拓扑黑闪。
+            // 夜间模式 SetNight 会先置 _mode 再调用 Start/EnsureVirtualDisplayAsync, 按需创建;
+            // 心跳与守护巡检照常运行, 切换夜间仍走纯拓扑或秒级复用路径。
+            if (_mode == OperatingMode.Night)
             {
-                try
+                Task.Run(async () =>
                 {
-                    await VddService.EnsureVirtualDisplayAsync();
-                    Logger.Ok("常驻虚拟屏就绪");
-                }
-                catch (Exception ex) { Logger.Error("常驻虚拟屏创建失败: " + ex.Message); }
-            });
+                    try
+                    {
+                        await VddService.EnsureVirtualDisplayAsync();
+                        Logger.Ok("常驻虚拟屏就绪");
+                    }
+                    catch (Exception ex) { Logger.Error("常驻虚拟屏创建失败: " + ex.Message); }
+                });
+            }
+            else
+            {
+                Logger.Info("本机模式启动: 不预建虚拟屏 (进入夜间模式时按需创建)");
+            }
             Task.Run(() => Loop(token), token);
             Logger.Ok("守护已开启");
             RaiseChanged();
@@ -156,10 +172,16 @@ namespace QuietScreen.Core
             RaiseChanged();
         }
 
-        /// <summary>立即执行一轮当前模式的维护</summary>
+        /// <summary>立即执行一轮当前模式的维护 (异步; 完成由返回的 Task 表示)</summary>
+        public Task CheckNowAsync()
+        {
+            return Task.Run(() => CheckAsync(true));
+        }
+
+        /// <summary>CheckNow 的即发即忘入口 (托盘菜单用): 调用立即返回, 结果经 SnapshotChanged 推送</summary>
         public void CheckNow()
         {
-            Task.Run(() => CheckAsync(true).Wait());
+            _ = CheckNowAsync();
         }
 
         private async Task Loop(CancellationToken token)
@@ -171,9 +193,13 @@ namespace QuietScreen.Core
                 try
                 {
                     if (firstRun)
+                    {
+                        Logger.Info("第一轮巡检开始 (等拓扑就绪 20s)");
                         await Task.Delay(TimeSpan.FromSeconds(20), token);   // 等显示拓扑就绪
+                    }
 
                     await CheckAsync(firstRun);
+                    if (firstRun) Logger.Ok("第一轮巡检完成");
                     firstRun = false;
 
                     await Task.Delay(interval, token);
@@ -208,11 +234,20 @@ namespace QuietScreen.Core
                     // ---- 夜间维护: 保证虚拟屏存在且为主屏 ----
                     if (!primaryVirtual)
                     {
-                        Logger.Warn($"夜间模式主屏异常 (当前: {primary?.ShortName ?? "?"}), 开始恢复虚拟屏...");
-                        Interlocked.Increment(ref _repairCount);
-                        string repairMsg = await RepairAsync();
-                        actions.Add(repairMsg);
-                        checkText = repairMsg;
+                        // "自动重建"开关接入: 关闭时夜间异常只报告不修复 (此前该开关未接线)
+                        if (!cfg.AutoCreateIfMissing)
+                        {
+                            checkText = "夜间模式主屏异常 (自动重建已关闭, 仅报告不修复)";
+                            Logger.Warn(checkText);
+                        }
+                        else
+                        {
+                            Logger.Warn($"夜间模式主屏异常 (当前: {primary?.ShortName ?? "?"}), 开始恢复虚拟屏...");
+                            Interlocked.Increment(ref _repairCount);
+                            string repairMsg = await RepairAsync();
+                            actions.Add(repairMsg);
+                            checkText = repairMsg;
+                        }
                     }
                     else
                     {
@@ -232,6 +267,10 @@ namespace QuietScreen.Core
                 else
                 {
                     // ---- 本机模式: 不碰拓扑, 但清掉多余的虚拟屏 (夜间模式才需要它们) ----
+                    // 若虚拟屏因上次夜间会话残留而仍为主屏: 先切回内屏 (一次干净的拓扑切换),
+                    // 再移除虚拟屏 — 直接移除会让 Windows 自行回退拓扑, 引发无序黑屏
+                    if (primaryVirtual)
+                        DisplayService.SwitchTo(DisplayService.Topology.InternalOnly);
                     checkText = "本机模式: 内屏使用中";
                     try
                     {

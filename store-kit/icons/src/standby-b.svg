@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+<linearGradient id="scr" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#141B3F"/><stop offset="0.5" stop-color="#0C1130"/><stop offset="1" stop-color="#060818"/>
+</linearGradient>
+<clipPath id="rd"><rect width="1024" height="1024" rx="230"/></clipPath>
+<filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="16"/></filter>
+</defs>
+<g clip-path="url(#rd)">
+<rect width="1024" height="1024" fill="url(#scr)"/>
+<polygon points="0,0 1024,0 1024,260 0,640" fill="#FFFFFF" opacity="0.04"/>
+<rect x="0" y="0" width="1024" height="3" fill="#FFFFFF" opacity="0.08"/>
+<rect x="366" y="788" width="292" height="30" rx="15" fill="#5FE0FF" opacity="0.55" filter="url(#soft)"/>
+<rect x="382" y="794" width="260" height="14" rx="7" fill="#5FE0FF"/>
+<rect x="0" y="1006" width="1024" height="18" fill="#000000" opacity="0.5"/>
+</g>
+</svg>

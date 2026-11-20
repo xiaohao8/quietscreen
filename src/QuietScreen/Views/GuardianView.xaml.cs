@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using QuietScreen.Core;
@@ -9,6 +10,8 @@ namespace QuietScreen.Views
     {
         private bool _loading = true;
 
+        private bool _envChecked;
+
         public GuardianView()
         {
             InitializeComponent();
@@ -17,6 +20,12 @@ namespace QuietScreen.Views
                 LoadFromConfig();
                 RefreshStatus();
                 GuardianService.Instance.SnapshotChanged += OnSnapshotChanged;
+                // 首次进入守护页自动体检一次 (只读, 结果留在卡片里供随时查看)
+                if (!_envChecked)
+                {
+                    _envChecked = true;
+                    BtnEnvCheck_Click(this, new RoutedEventArgs());
+                }
             };
             Unloaded += (s, e) => GuardianService.Instance.SnapshotChanged -= OnSnapshotChanged;
         }
@@ -85,7 +94,8 @@ namespace QuietScreen.Views
         private void Interval_Changed(object sender, RoutedEventArgs e)
         {
             if (_loading) return;
-            if (int.TryParse(IntervalBox.Text.Trim(), out int v) && v >= 5 && v <= 3600)
+            // 界面标注"最小 10", 巡检循环也有 Math.Max(10, ...) 兜底 — 校验保持一致
+            if (int.TryParse(IntervalBox.Text.Trim(), out int v) && v >= 10 && v <= 3600)
                 Save(c => c.CheckIntervalSec = v);
         }
 
@@ -107,12 +117,42 @@ namespace QuietScreen.Views
             });
         }
 
-        private void BtnCheckNow_Click(object sender, RoutedEventArgs e)
+        private async void BtnEnvCheck_Click(object sender, RoutedEventArgs e)
+        {
+            BtnEnvCheck.IsEnabled = false;
+            EnvResultText.Text = "体检中...";
+            try
+            {
+                var items = await Task.Run(() => RemoteEnvCheck.Run());
+                var sb = new System.Text.StringBuilder();
+                int warnCount = 0;
+                foreach (var it in items)
+                {
+                    sb.AppendLine(it.ToString());
+                    if (!it.Pass) warnCount++;
+                }
+                EnvResultText.Text = sb.ToString().TrimEnd();
+                Logger.Info("远控环境体检完成: " + warnCount + " 项待处理");
+            }
+            finally
+            {
+                BtnEnvCheck.IsEnabled = true;
+            }
+        }
+
+        private async void BtnCheckNow_Click(object sender, RoutedEventArgs e)
         {
             BtnCheckNow.IsEnabled = false;
-            GuardianService.Instance.CheckNow();
-            RefreshStatus();
-            BtnCheckNow.IsEnabled = true;
+            try
+            {
+                // 检查完成后刷新状态 (原实现在检查完成前就刷新, 状态总是旧的)
+                await GuardianService.Instance.CheckNowAsync();
+                RefreshStatus();
+            }
+            finally
+            {
+                BtnCheckNow.IsEnabled = true;
+            }
         }
     }
 }

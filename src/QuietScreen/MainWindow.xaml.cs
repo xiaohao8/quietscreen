@@ -129,6 +129,17 @@ namespace QuietScreen
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            // Alt+F4 / 系统关闭路径: 与自定义 ✕ 行为一致 —— 守护运行时不真正退出,
+            // 防止夜间远控中窗口被误关导致守护/心跳消失 (虚拟屏 1 秒内被驱动看门狗回收)
+            if (GuardianService.Instance.IsRunning)
+            {
+                e.Cancel = true;
+                Hide();
+                MemoryTrimmer.Trim();
+                ToastService.Show("QuietScreen", "已最小化到托盘, 守护继续运行\n(真正退出: 托盘右键 → 退出)");
+                return;
+            }
+            Logger.Info("主窗口关闭, 程序退出");
             _statusTimer?.Stop();
             base.OnClosing(e);
         }

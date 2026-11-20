@@ -67,6 +67,47 @@
                 </StackPanel>
             </Border>
 
+            <!-- 性能模式 -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="性能模式 (风扇降噪)" Style="{StaticResource H2}" Margin="0,0,0,6"/>
+                    <TextBlock Style="{StaticResource Sub}" Margin="0,0,0,10"
+                               Text="拯救者三档 = Fn+Q 循环的官方接口 (野兽拉满/均衡/安静); Windows 电源档 = 系统「电源模式」滑条。夜间开狂暴模式风扇吵到室友, 切安静档即可。"/>
+                    <Grid Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="拯救者档位" Style="{StaticResource Body}"/>
+                            <TextBlock x:Name="LegionStatusText" Style="{StaticResource Sub}" Margin="0,3,0,0" Text="检测中..."/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button x:Name="BtnLegionBeast" Style="{StaticResource BtnDark}" Content="野兽/狂暴" Tag="0" Click="BtnLegionMode_Click"/>
+                            <Button x:Name="BtnLegionBalanced" Style="{StaticResource BtnDark}" Content="均衡" Tag="1" Margin="8,0,0,0" Click="BtnLegionMode_Click"/>
+                            <Button x:Name="BtnLegionQuiet" Style="{StaticResource BtnDark}" Content="安静" Tag="2" Margin="8,0,0,0" Click="BtnLegionMode_Click"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="Windows 电源档" Style="{StaticResource Body}"/>
+                            <TextBlock x:Name="OverlayStatusText" Style="{StaticResource Sub}" Margin="0,3,0,0" Text="检测中..."/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button x:Name="BtnOverlayEfficiency" Style="{StaticResource BtnDark}" Content="最佳能效" Tag="efficiency" Click="BtnOverlay_Click"/>
+                            <Button x:Name="BtnOverlayBalanced" Style="{StaticResource BtnDark}" Content="平衡" Tag="balanced" Margin="8,0,0,0" Click="BtnOverlay_Click"/>
+                            <Button x:Name="BtnOverlayPerformance" Style="{StaticResource BtnDark}" Content="最佳性能" Tag="performance" Margin="8,0,0,0" Click="BtnOverlay_Click"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="进入夜间远控时自动降噪" Style="{StaticResource Body}"/>
+                            <TextBlock Style="{StaticResource Sub}" Margin="0,3,0,0"
+                                       Text="切夜间远控时自动降档 (拯救者→安静, 电源档→最佳能效), 回本机时自动还原切换前的档位。"/>
+                        </StackPanel>
+                        <ToggleButton x:Name="NightQuietSwitch" Style="{StaticResource Switch}"
+                                      HorizontalAlignment="Right" VerticalAlignment="Center"
+                                      Checked="NightQuiet_Changed" Unchecked="NightQuiet_Changed"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!-- 键盘熄灯 -->
             <Border Style="{StaticResource Card}">
                 <StackPanel>
@@ -83,8 +124,6 @@
                     <TextBlock x:Name="LampCapText" Style="{StaticResource Sub}" Margin="0,0,0,8" Text="灯效设备: 检测中..."/>
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="BtnLightsOff" Style="{StaticResource BtnDark}" Content="立即尝试熄灯" Click="BtnLightsOff_Click"/>
-                        <Button x:Name="BtnOpenRgbOff" Style="{StaticResource BtnDark}" Content="通过 OpenRGB 熄灯" Margin="10,0,0,0"
-                                Click="BtnOpenRgbOff_Click"/>
                         <Button Style="{StaticResource BtnDark}" Content="OpenRGB 官网" Margin="10,0,0,0"
                                 Click="BtnOpenRgbSite_Click"/>
                     </StackPanel>
@@ -107,8 +146,8 @@
             <Border Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock Text="关于" Style="{StaticResource H2}" Margin="0,0,0,6"/>
-                    <TextBlock Style="{StaticResource Sub}"
-                               Text="QuietScreen 虚拟屏管家 v1.0.0 — 虚拟屏守护与息屏远控工具。"/>
+                    <TextBlock x:Name="AboutText" Style="{StaticResource Sub}"
+                               Text="QuietScreen 屏息 — 虚拟屏守护与息屏远控工具。"/>
                     <TextBlock Style="{StaticResource Sub}" Margin="0,6,0,0"
                                Text="虚拟屏控制能力移植自开源项目 nomi-san/parsec-vdd (MIT License), https://github.com/nomi-san/parsec-vdd"/>
                     <TextBlock Style="{StaticResource Sub}" Margin="0,4,0,0"

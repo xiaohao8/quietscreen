@@ -228,12 +228,14 @@ namespace QuietScreen.Core.Vdd
 
         /// <summary>
         /// 心跳保活: 必须 <=200ms 调用一次, 停止约 1 秒驱动看门狗会拔掉所有虚拟屏。
-        /// 热路径优化: 事件句柄与输入缓冲区常驻复用 (锁串行), 消除 10 次/秒的
-        /// 内核对象创建/销毁开销。
+        /// 热路径优化: 事件句柄、输入缓冲区与原生 OVERLAPPED 常驻复用 (锁串行),
+        /// 消除 10 次/秒的内核对象创建/销毁开销; OVERLAPPED 位于原生内存,
+        /// 生命周期严格覆盖异步 IRP —— 消除 ref 编组临时副本的栈踩踏风险。
         /// </summary>
         private static readonly object HotGate = new object();
         private static IntPtr _hotEvent = IntPtr.Zero;
         private static IntPtr _hotBuffer = IntPtr.Zero;
+        private static IntPtr _hotOverlapped = IntPtr.Zero;
 
         public static void Update(IntPtr vdd)
         {
@@ -245,21 +247,28 @@ namespace QuietScreen.Core.Vdd
                     _hotBuffer = Marshal.AllocHGlobal(32);
                     for (int i = 0; i < 32; i += 8) Marshal.WriteInt64(_hotBuffer, i, 0);
                     _hotEvent = Native.CreateEventW(IntPtr.Zero, false, false, null);
-                    if (_hotEvent == IntPtr.Zero)
+                    _hotOverlapped = Marshal.AllocHGlobal(32);
+                    if (_hotEvent == IntPtr.Zero || _hotOverlapped == IntPtr.Zero)
                     {
+                        if (_hotEvent != IntPtr.Zero) Native.CloseHandle(_hotEvent);
+                        if (_hotOverlapped != IntPtr.Zero) Marshal.FreeHGlobal(_hotOverlapped);
                         Marshal.FreeHGlobal(_hotBuffer);
-                        _hotBuffer = IntPtr.Zero;
+                        _hotEvent = IntPtr.Zero; _hotBuffer = IntPtr.Zero; _hotOverlapped = IntPtr.Zero;
                         return;
                     }
+                    // OVERLAPPED: Internal/InternalHigh/Offset 由内核维护, hEvent 常驻
+                    for (int i = 0; i < 32; i += 8) Marshal.WriteInt64(_hotOverlapped, i, 0);
+                    Marshal.WriteIntPtr(_hotOverlapped, 24, _hotEvent);
                 }
                 for (int i = 0; i < 32; i += 8) Marshal.WriteInt64(_hotBuffer, i, 0); // 输入清零
+                Marshal.WriteInt64(_hotOverlapped, 0, 0);   // Internal 清零
+                Marshal.WriteInt64(_hotOverlapped, 8, 0);   // InternalHigh 清零
 
-                var overlapped = new Native.OVERLAPPED { hEvent = _hotEvent };
-                Native.DeviceIoControl(vdd, IOCTL_UPDATE, _hotBuffer, 32, IntPtr.Zero, 0, IntPtr.Zero, ref overlapped);
-                if (!Native.GetOverlappedResultEx(vdd, ref overlapped, out _, 1000, false))
+                Native.DeviceIoControl(vdd, IOCTL_UPDATE, _hotBuffer, 32, IntPtr.Zero, 0, IntPtr.Zero, _hotOverlapped);
+                if (!Native.GetOverlappedResultEx(vdd, _hotOverlapped, out _, 1000, false))
                 {
-                    Native.CancelIoEx(vdd, ref overlapped);
-                    Native.GetOverlappedResult(vdd, ref overlapped, out _, true);
+                    Native.CancelIoEx(vdd, _hotOverlapped);
+                    Native.GetOverlappedResult(vdd, _hotOverlapped, out _, true);
                 }
             }
         }
@@ -292,9 +301,11 @@ namespace QuietScreen.Core.Vdd
             if (!IsValidHandle(handle)) return false;
 
             const int inSize = 32;
+            const int ovSize = 32;                          // x64 OVERLAPPED = 32 字节
             IntPtr inBuffer = Marshal.AllocHGlobal(inSize);
             IntPtr outBuffer = IntPtr.Zero;
-            var overlapped = new Native.OVERLAPPED();
+            IntPtr overlapped = Marshal.AllocHGlobal(ovSize);
+            IntPtr hEvent = IntPtr.Zero;
 
             try
             {
@@ -308,19 +319,22 @@ namespace QuietScreen.Core.Vdd
                 int outSize = wantResult ? 4 : 0;
                 if (wantResult) outBuffer = Marshal.AllocHGlobal(4);
 
-                overlapped.hEvent = Native.CreateEventW(IntPtr.Zero, false, false, null);
-                if (overlapped.hEvent == IntPtr.Zero) return false;
+                // 原生 OVERLAPPED: 全零初始化, hEvent 置于偏移 24 (x64 布局)
+                for (int i = 0; i < ovSize; i += 8) Marshal.WriteInt64(overlapped, i, 0);
+                hEvent = Native.CreateEventW(IntPtr.Zero, false, false, null);
+                if (hEvent == IntPtr.Zero) return false;
+                Marshal.WriteIntPtr(overlapped, 24, hEvent);
 
                 Native.DeviceIoControl(handle, code, inBuffer, inSize,
-                    outBuffer, outSize, IntPtr.Zero, ref overlapped);
+                    outBuffer, outSize, IntPtr.Zero, overlapped);
 
-                bool success = Native.GetOverlappedResultEx(handle, ref overlapped,
+                bool success = Native.GetOverlappedResultEx(handle, overlapped,
                     out _, timeout, false);
 
                 if (!success)
                 {
-                    Native.CancelIoEx(handle, ref overlapped);
-                    Native.GetOverlappedResult(handle, ref overlapped, out _, true);
+                    Native.CancelIoEx(handle, overlapped);
+                    Native.GetOverlappedResult(handle, overlapped, out _, true);
                 }
 
                 if (success && wantResult)
@@ -330,9 +344,10 @@ namespace QuietScreen.Core.Vdd
             }
             finally
             {
-                if (overlapped.hEvent != IntPtr.Zero) Native.CloseHandle(overlapped.hEvent);
+                if (hEvent != IntPtr.Zero) Native.CloseHandle(hEvent);
                 if (outBuffer != IntPtr.Zero) Marshal.FreeHGlobal(outBuffer);
                 Marshal.FreeHGlobal(inBuffer);
+                Marshal.FreeHGlobal(overlapped);
             }
         }
 
@@ -445,23 +460,23 @@ namespace QuietScreen.Core.Vdd
                 IntPtr hDevice, uint ioControlCode,
                 IntPtr lpInBuffer, int nInBufferSize,
                 IntPtr lpOutBuffer, int nOutBufferSize,
-                IntPtr lpBytesReturned, ref OVERLAPPED lpOverlapped);
+                IntPtr lpBytesReturned, IntPtr lpOverlapped);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool GetOverlappedResultEx(
-                IntPtr hDevice, ref OVERLAPPED lpOverlapped,
+                IntPtr hDevice, IntPtr lpOverlapped,
                 out uint lpNumberOfBytesTransferred, int dwMilliseconds, bool bAlertable);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool GetOverlappedResult(
-                IntPtr hDevice, ref OVERLAPPED lpOverlapped,
+                IntPtr hDevice, IntPtr lpOverlapped,
                 out uint lpNumberOfBytesTransferred, bool bWait);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CancelIoEx(IntPtr hDevice, ref OVERLAPPED lpOverlapped);
+            public static extern bool CancelIoEx(IntPtr hDevice, IntPtr lpOverlapped);
 
             [DllImport("cfgmgr32.dll")]
             public static extern uint CM_Get_DevNode_Status(

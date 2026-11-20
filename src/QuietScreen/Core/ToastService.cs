@@ -6,10 +6,14 @@ namespace QuietScreen.Core
 {
     /// <summary>
     /// Windows Toast 通知。MSIX 打包后 AUMID 自动来自包标识, 开箱即用;
-    /// 未打包运行时可能不可用 (降级为仅写日志)。
+    /// 未打包运行时 WinRT Toast 不可用, 自动降级为托盘气泡 (由 TrayService 注册兜底),
+    /// 保证"定时关机触发"等关键通知在任何运行形态下都能到达用户。
     /// </summary>
     public static class ToastService
     {
+        /// <summary>托盘气泡兜底 (TrayService.Init 注册); 参数: title, body</summary>
+        public static Action<string, string> Fallback;
+
         public static void Show(string title, string body)
         {
             try
@@ -24,7 +28,8 @@ namespace QuietScreen.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn("通知发送失败 (未打包运行时属正常): " + ex.Message);
+                Logger.Warn("Toast 不可用, 转托盘气泡: " + ex.Message);
+                try { Fallback?.Invoke(title ?? "QuietScreen", body ?? ""); } catch { }
             }
         }
 

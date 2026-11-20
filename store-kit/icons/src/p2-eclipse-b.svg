@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+<clipPath id="sqc"><path d="M 1024.0 512.0 L 1023.6 684.0 L 1022.2 738.8 L 1020.0 778.3 L 1016.9 810.2 L 1013.0 837.2 L 1008.0 860.7 L 1002.2 881.4 L 995.4 900.0 L 987.6 916.7 L 978.7 931.8 L 968.8 945.4 L 957.7 957.7 L 945.4 968.8 L 931.8 978.7 L 916.7 987.6 L 900.0 995.4 L 881.4 1002.2 L 860.7 1008.0 L 837.2 1013.0 L 810.2 1016.9 L 778.3 1020.0 L 738.8 1022.2 L 684.0 1023.6 L 512.0 1024.0 L 340.0 1023.6 L 285.2 1022.2 L 245.7 1020.0 L 213.8 1016.9 L 186.8 1013.0 L 163.3 1008.0 L 142.6 1002.2 L 124.0 995.4 L 107.3 987.6 L 92.2 978.7 L 78.6 968.8 L 66.3 957.7 L 55.2 945.4 L 45.3 931.8 L 36.4 916.7 L 28.6 900.0 L 21.8 881.4 L 16.0 860.7 L 11.0 837.2 L 7.1 810.2 L 4.0 778.3 L 1.8 738.8 L 0.4 684.0 L 0.0 512.0 L 0.4 340.0 L 1.8 285.2 L 4.0 245.7 L 7.1 213.8 L 11.0 186.8 L 16.0 163.3 L 21.8 142.6 L 28.6 124.0 L 36.4 107.3 L 45.3 92.2 L 55.2 78.6 L 66.3 66.3 L 78.6 55.2 L 92.2 45.3 L 107.3 36.4 L 124.0 28.6 L 142.6 21.8 L 163.3 16.0 L 186.8 11.0 L 213.8 7.1 L 245.7 4.0 L 285.2 1.8 L 340.0 0.4 L 512.0 0.0 L 684.0 0.4 L 738.8 1.8 L 778.3 4.0 L 810.2 7.1 L 837.2 11.0 L 860.7 16.0 L 881.4 21.8 L 900.0 28.6 L 916.7 36.4 L 931.8 45.3 L 945.4 55.2 L 957.7 66.3 L 968.8 78.6 L 978.7 92.2 L 987.6 107.3 L 995.4 124.0 L 1002.2 142.6 L 1008.0 163.3 L 1013.0 186.8 L 1016.9 213.8 L 1020.0 245.7 L 1022.2 285.2 L 1023.6 340.0 Z"/></clipPath>
+<linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#0D1526"/><stop offset="1" stop-color="#050810"/>
+</linearGradient>
+<linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#22304E" stop-opacity="0.92"/><stop offset="1" stop-color="#101A30" stop-opacity="0.92"/>
+</linearGradient>
+<radialGradient id="ambient" cx="50%" cy="50%" r="50%">
+<stop offset="0" stop-color="#9FE0FF" stop-opacity="0.35"/><stop offset="1" stop-color="#9FE0FF" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="moonFace" cx="40%" cy="62%" r="78%">
+<stop offset="0" stop-color="#F4FCFF"/><stop offset="0.45" stop-color="#BFE4FB"/><stop offset="1" stop-color="#529DD4"/>
+</radialGradient>
+<linearGradient id="rim" x1="0" y1="252" x2="0" y2="560" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.38"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+</linearGradient>
+<radialGradient id="vig" cx="50%" cy="40%" r="80%">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.34"/>
+</radialGradient>
+<filter id="cardShadow" x="-40%" y="-40%" width="180%" height="190%">
+<feDropShadow dx="0" dy="18" stdDeviation="26" flood-color="#000000" flood-opacity="0.5"/>
+</filter>
+<filter id="bloomWide" x="-80%" y="-80%" width="260%" height="260%">
+<feGaussianBlur stdDeviation="26"/>
+</filter>
+<filter id="bloomTight" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter><linearGradient id="glassDepth" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.16"/></linearGradient><mask id="cardMask"><rect x="272" y="252" width="480" height="520" rx="110" fill="white"/></mask><mask id="hole">
+<rect x="272" y="252" width="480" height="520" rx="110" fill="white"/>
+<path d="M 512 322 A 118 118 0 1 0 630 440 A 98 98 0 1 1 512 322 Z" fill="black"/>
+</mask>
+</defs>
+<path d="M 1024.0 512.0 L 1023.6 684.0 L 1022.2 738.8 L 1020.0 778.3 L 1016.9 810.2 L 1013.0 837.2 L 1008.0 860.7 L 1002.2 881.4 L 995.4 900.0 L 987.6 916.7 L 978.7 931.8 L 968.8 945.4 L 957.7 957.7 L 945.4 968.8 L 931.8 978.7 L 916.7 987.6 L 900.0 995.4 L 881.4 1002.2 L 860.7 1008.0 L 837.2 1013.0 L 810.2 1016.9 L 778.3 1020.0 L 738.8 1022.2 L 684.0 1023.6 L 512.0 1024.0 L 340.0 1023.6 L 285.2 1022.2 L 245.7 1020.0 L 213.8 1016.9 L 186.8 1013.0 L 163.3 1008.0 L 142.6 1002.2 L 124.0 995.4 L 107.3 987.6 L 92.2 978.7 L 78.6 968.8 L 66.3 957.7 L 55.2 945.4 L 45.3 931.8 L 36.4 916.7 L 28.6 900.0 L 21.8 881.4 L 16.0 860.7 L 11.0 837.2 L 7.1 810.2 L 4.0 778.3 L 1.8 738.8 L 0.4 684.0 L 0.0 512.0 L 0.4 340.0 L 1.8 285.2 L 4.0 245.7 L 7.1 213.8 L 11.0 186.8 L 16.0 163.3 L 21.8 142.6 L 28.6 124.0 L 36.4 107.3 L 45.3 92.2 L 55.2 78.6 L 66.3 66.3 L 78.6 55.2 L 92.2 45.3 L 107.3 36.4 L 124.0 28.6 L 142.6 21.8 L 163.3 16.0 L 186.8 11.0 L 213.8 7.1 L 245.7 4.0 L 285.2 1.8 L 340.0 0.4 L 512.0 0.0 L 684.0 0.4 L 738.8 1.8 L 778.3 4.0 L 810.2 7.1 L 837.2 11.0 L 860.7 16.0 L 881.4 21.8 L 900.0 28.6 L 916.7 36.4 L 931.8 45.3 L 945.4 55.2 L 957.7 66.3 L 968.8 78.6 L 978.7 92.2 L 987.6 107.3 L 995.4 124.0 L 1002.2 142.6 L 1008.0 163.3 L 1013.0 186.8 L 1016.9 213.8 L 1020.0 245.7 L 1022.2 285.2 L 1023.6 340.0 Z" fill="url(#tile)"/>
+<circle cx="512" cy="440" r="380" fill="url(#ambient)"/>
+<rect x="272" y="270" width="480" height="520" rx="110" fill="#000000" opacity="0.35" filter="url(#cardShadow)"/>
+<rect x="272" y="252" width="480" height="520" rx="110" fill="url(#card)" mask="url(#hole)"/>
+<rect x="272" y="252" width="480" height="520" rx="110" fill="url(#glassDepth)" mask="url(#cardMask)"/>
+<rect x="273.5" y="253.5" width="477" height="517" rx="108.5" fill="none" stroke="url(#rim)" stroke-width="3"/>
+<path d="M 512 322 A 118 118 0 1 0 630 440 A 98 98 0 1 1 512 322 Z" fill="#9FE0FF" opacity="0.45" filter="url(#bloomWide)"/>
+<path d="M 512 322 A 118 118 0 1 0 630 440 A 98 98 0 1 1 512 322 Z" fill="#D6F3FF" opacity="0.85" filter="url(#bloomTight)"/>
+<path d="M 512 322 A 118 118 0 1 0 630 440 A 98 98 0 1 1 512 322 Z" fill="url(#moonFace)"/>
+<path d="M 512 322 A 118 118 0 1 0 630 440 A 98 98 0 1 1 512 322 Z" fill="none" stroke="#EAF9FF" stroke-opacity="0.5" stroke-width="2.5"/>
+<rect x="70" y="70" width="884" height="884" rx="190" fill="url(#vig)" clip-path="url(#sqc)"/>
+</svg>

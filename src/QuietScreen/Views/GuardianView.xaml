@@ -49,6 +49,19 @@
                 </StackPanel>
             </Border>
 
+            <!-- 远控环境体检 -->
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="远控环境体检" Style="{StaticResource H2}"/>
+                        <Button x:Name="BtnEnvCheck" Style="{StaticResource BtnDark}" Content="开始体检"
+                                HorizontalAlignment="Right" Margin="0,-8,0,0" Click="BtnEnvCheck_Click"/>
+                    </Grid>
+                    <TextBlock x:Name="EnvResultText" Style="{StaticResource Sub}" TextWrapping="Wrap"
+                               Text="只读检查“重启后能否顺利连回”的隐藏前提：自动登录 / 屏保锁定 / 待重启更新 / 驱动状态 / 防睡眠。"/>
+                </StackPanel>
+            </Border>
+
             <!-- 检查选项 -->
             <Border Style="{StaticResource Card}">
                 <StackPanel>
@@ -108,7 +121,7 @@
                     <TextBlock Text="启动参数" Style="{StaticResource Sub}" Margin="0,8,0,4"/>
                     <TextBox x:Name="AgentArgsBox" Style="{StaticResource DarkTextBox}" LostFocus="Agent_Changed"/>
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <TextBlock Text="监听端口" Style="{StaticResource Body}" VerticalAlignment="Center"/>
+                        <TextBlock Text="监听端口 (0=进程模式)" Style="{StaticResource Body}" VerticalAlignment="Center"/>
                         <TextBox x:Name="AgentPortBox" Style="{StaticResource DarkTextBox}" Width="90" Margin="10,0,0,0"
                                  LostFocus="Agent_Changed"/>
                     </StackPanel>

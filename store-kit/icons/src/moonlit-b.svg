@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+<linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F3F5FB"/><stop offset="1" stop-color="#DCE2EF"/>
+</linearGradient>
+<linearGradient id="scr" gradientUnits="userSpaceOnUse" x1="0" y1="164" x2="0" y2="748">
+<stop offset="0" stop-color="#181E42"/><stop offset="1" stop-color="#0B0E26"/>
+</linearGradient>
+<radialGradient id="night" cx="50%" cy="100%" r="95%">
+<stop offset="0" stop-color="#2E3C86" stop-opacity="0.5"/><stop offset="1" stop-color="#2E3C86" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="moonShade" x1="0" y1="1" x2="0.9" y2="0">
+<stop offset="0" stop-color="#FFEDC4"/><stop offset="1" stop-color="#F3AE4E"/>
+</linearGradient>
+<radialGradient id="halo" cx="50%" cy="50%" r="50%">
+<stop offset="0" stop-color="#FFC24B" stop-opacity="0.45"/><stop offset="0.55" stop-color="#FFC24B" stop-opacity="0.13"/><stop offset="1" stop-color="#FFC24B" stop-opacity="0"/>
+</radialGradient>
+<clipPath id="sqc"><path d="M 1024.0 512.0 L 1023.6 684.0 L 1022.2 738.8 L 1020.0 778.3 L 1016.9 810.2 L 1013.0 837.2 L 1008.0 860.7 L 1002.2 881.4 L 995.4 900.0 L 987.6 916.7 L 978.7 931.8 L 968.8 945.4 L 957.7 957.7 L 945.4 968.8 L 931.8 978.7 L 916.7 987.6 L 900.0 995.4 L 881.4 1002.2 L 860.7 1008.0 L 837.2 1013.0 L 810.2 1016.9 L 778.3 1020.0 L 738.8 1022.2 L 684.0 1023.6 L 512.0 1024.0 L 340.0 1023.6 L 285.2 1022.2 L 245.7 1020.0 L 213.8 1016.9 L 186.8 1013.0 L 163.3 1008.0 L 142.6 1002.2 L 124.0 995.4 L 107.3 987.6 L 92.2 978.7 L 78.6 968.8 L 66.3 957.7 L 55.2 945.4 L 45.3 931.8 L 36.4 916.7 L 28.6 900.0 L 21.8 881.4 L 16.0 860.7 L 11.0 837.2 L 7.1 810.2 L 4.0 778.3 L 1.8 738.8 L 0.4 684.0 L 0.0 512.0 L 0.4 340.0 L 1.8 285.2 L 4.0 245.7 L 7.1 213.8 L 11.0 186.8 L 16.0 163.3 L 21.8 142.6 L 28.6 124.0 L 36.4 107.3 L 45.3 92.2 L 55.2 78.6 L 66.3 66.3 L 78.6 55.2 L 92.2 45.3 L 107.3 36.4 L 124.0 28.6 L 142.6 21.8 L 163.3 16.0 L 186.8 11.0 L 213.8 7.1 L 245.7 4.0 L 285.2 1.8 L 340.0 0.4 L 512.0 0.0 L 684.0 0.4 L 738.8 1.8 L 778.3 4.0 L 810.2 7.1 L 837.2 11.0 L 860.7 16.0 L 881.4 21.8 L 900.0 28.6 L 916.7 36.4 L 931.8 45.3 L 945.4 55.2 L 957.7 66.3 L 968.8 78.6 L 978.7 92.2 L 987.6 107.3 L 995.4 124.0 L 1002.2 142.6 L 1008.0 163.3 L 1013.0 186.8 L 1016.9 213.8 L 1020.0 245.7 L 1022.2 285.2 L 1023.6 340.0 Z"/></clipPath><radialGradient id="vig" cx="50%" cy="40%" r="80%">
+<stop offset="0.62" stop-color="#1B2340" stop-opacity="0"/><stop offset="1" stop-color="#1B2340" stop-opacity="0.18"/>
+</radialGradient>
+<clipPath id="scrClip"><rect x="180" y="164" width="664" height="584" rx="42"/></clipPath>
+<mask id="crescent">
+<rect x="180" y="164" width="664" height="584" fill="black"/>
+<circle cx="615" cy="320" r="118" fill="white"/>
+<circle cx="678" cy="272" r="97" fill="black"/>
+</mask>
+<filter id="plateShadow" x="-30%" y="-30%" width="160%" height="170%">
+<feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#1B2340" flood-opacity="0.30"/>
+</filter>
+</defs>
+<path d="M 1024.0 512.0 L 1023.6 684.0 L 1022.2 738.8 L 1020.0 778.3 L 1016.9 810.2 L 1013.0 837.2 L 1008.0 860.7 L 1002.2 881.4 L 995.4 900.0 L 987.6 916.7 L 978.7 931.8 L 968.8 945.4 L 957.7 957.7 L 945.4 968.8 L 931.8 978.7 L 916.7 987.6 L 900.0 995.4 L 881.4 1002.2 L 860.7 1008.0 L 837.2 1013.0 L 810.2 1016.9 L 778.3 1020.0 L 738.8 1022.2 L 684.0 1023.6 L 512.0 1024.0 L 340.0 1023.6 L 285.2 1022.2 L 245.7 1020.0 L 213.8 1016.9 L 186.8 1013.0 L 163.3 1008.0 L 142.6 1002.2 L 124.0 995.4 L 107.3 987.6 L 92.2 978.7 L 78.6 968.8 L 66.3 957.7 L 55.2 945.4 L 45.3 931.8 L 36.4 916.7 L 28.6 900.0 L 21.8 881.4 L 16.0 860.7 L 11.0 837.2 L 7.1 810.2 L 4.0 778.3 L 1.8 738.8 L 0.4 684.0 L 0.0 512.0 L 0.4 340.0 L 1.8 285.2 L 4.0 245.7 L 7.1 213.8 L 11.0 186.8 L 16.0 163.3 L 21.8 142.6 L 28.6 124.0 L 36.4 107.3 L 45.3 92.2 L 55.2 78.6 L 66.3 66.3 L 78.6 55.2 L 92.2 45.3 L 107.3 36.4 L 124.0 28.6 L 142.6 21.8 L 163.3 16.0 L 186.8 11.0 L 213.8 7.1 L 245.7 4.0 L 285.2 1.8 L 340.0 0.4 L 512.0 0.0 L 684.0 0.4 L 738.8 1.8 L 778.3 4.0 L 810.2 7.1 L 837.2 11.0 L 860.7 16.0 L 881.4 21.8 L 900.0 28.6 L 916.7 36.4 L 931.8 45.3 L 945.4 55.2 L 957.7 66.3 L 968.8 78.6 L 978.7 92.2 L 987.6 107.3 L 995.4 124.0 L 1002.2 142.6 L 1008.0 163.3 L 1013.0 186.8 L 1016.9 213.8 L 1020.0 245.7 L 1022.2 285.2 L 1023.6 340.0 Z" fill="url(#tile)"/>
+<rect x="152" y="136" width="720" height="640" rx="64" fill="#FFFFFF" filter="url(#plateShadow)"/>
+<rect x="152.5" y="136.5" width="719" height="639" rx="63.5" fill="none" stroke="#D7DDF9" stroke-opacity="0.9" stroke-width="2"/>
+<rect x="180" y="164" width="664" height="584" rx="42" fill="url(#scr)"/>
+<g clip-path="url(#scrClip)">
+<ellipse cx="512" cy="790" rx="430" ry="220" fill="url(#night)"/>
+<circle cx="615" cy="320" r="185" fill="url(#halo)"/>
+<circle cx="615" cy="320" r="118" fill="url(#moonShade)" mask="url(#crescent)"/>
+<polygon points="180,164 844,164 844,336 180,556" fill="#FFFFFF" opacity="0.04"/>
+<circle cx="330" cy="610" r="14" fill="#3E4878"/>
+<circle cx="396" cy="646" r="9" fill="#353E68"/>
+</g>
+<rect width="1024" height="1024" fill="url(#vig)" clip-path="url(#sqc)"/>
+</svg>

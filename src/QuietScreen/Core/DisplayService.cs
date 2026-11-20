@@ -80,18 +80,6 @@ namespace QuietScreen.Core
             return p != null && p.IsVirtual;
         }
 
-        /// <summary>轮询等待主屏满足条件 (每 3 秒查一次)</summary>
-        public static bool WaitPrimary(Func<DisplayInfo, bool> predicate, int tries)
-        {
-            for (int i = 0; i < tries; i++)
-            {
-                Task.Delay(3000).Wait();
-                var p = GetPrimary();
-                if (p != null && predicate(p)) return true;
-            }
-            return false;
-        }
-
         // ---------------- 拓扑切换 ----------------
         public enum Topology { InternalOnly, ExternalOnly, Extend, Duplicate }
 

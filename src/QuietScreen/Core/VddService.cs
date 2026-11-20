@@ -126,8 +126,9 @@ namespace QuietScreen.Core
                 return r;
             }
 
-            // 等待 GDI 枚举出新屏幕 (拓扑变化有延迟)
-            for (int attempt = 0; attempt < 15; attempt++)
+            // 等待 GDI 枚举出新屏幕 (拓扑变化有延迟;
+            // 刚移除又重建的场景物化更慢, 实测 ~30 秒 — 窗口放宽到 50 秒)
+            for (int attempt = 0; attempt < 25; attempt++)
             {
                 Thread.Sleep(2000);
                 var screens = VddDisplay.GetParsecDisplays();
@@ -153,46 +154,6 @@ namespace QuietScreen.Core
             EnsureStarted();
             int removed = VddController.RemoveAllDisplays();
             return new VddResult { Success = removed > 0, Message = $"已移除 {removed} 个虚拟屏" };
-        }
-
-        /// <summary>
-        /// 清理积压的旧虚拟屏: 保留当前主屏。设门槛 (多于 3 个才清, 一次清一个):
-        /// 实测移除显示器会触发 Windows 重排拓扑, 频繁清理反而引起主屏翻面。
-        /// </summary>
-        public static int RemoveStaleVirtualDisplays()
-        {
-            EnsureStarted();
-            var primary = DisplayService.GetPrimary();
-            string keep = primary?.DeviceName;
-            var displays = VddDisplay.GetParsecDisplays();
-            int removed = 0;
-            foreach (var d in displays)
-            {
-                if (keep != null && string.Equals(d.DeviceName, keep, StringComparison.OrdinalIgnoreCase))
-                    continue;   // 主屏留着
-                try
-                {
-                    if (VddController.RemoveDisplay(d.DriverIndex)) removed++;
-                }
-                catch { }
-            }
-            // 驱动层清扫幽灵屏: 保留主屏对应的驱动索引
-            int? keepIdx = VddDisplay.GetParsecDisplays()
-                .Where(x => keep != null && string.Equals(x.DeviceName, keep, StringComparison.OrdinalIgnoreCase))
-                .Select(x => x.DriverIndex).FirstOrDefault();
-            if (keepIdx == null || keepIdx < 0) keepIdx = -1;
-            var handleReady = VddController.WaitForReady(2000);
-            if (handleReady)
-            {
-                var h = VddController.HandleRef;
-                for (int idx = 0; idx < 16; idx++)
-                {
-                    if (idx == keepIdx) continue;
-                    try { if (VddDriver.RemoveDisplay(h, idx)) removed++; } catch { }
-                }
-            }
-            if (removed > 0) Logger.Ok($"已清理 {removed} 个多余的虚拟屏/幽灵屏 (保留主屏)");
-            return removed;
         }
     }
 }

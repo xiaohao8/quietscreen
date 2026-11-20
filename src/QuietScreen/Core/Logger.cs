@@ -26,6 +26,9 @@ namespace QuietScreen.Core
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(_logFile));
+                // 轮转: 超过 2MB 归档为 .old (常驻应用防日志无限增长)
+                if (File.Exists(_logFile) && new FileInfo(_logFile).Length > 2 * 1024 * 1024)
+                    File.Move(_logFile, _logFile + ".old", overwrite: true);
                 // 带 BOM 的 UTF-8, 记事本/PowerShell 打开不乱码
                 if (!File.Exists(_logFile))
                     File.WriteAllText(_logFile, "", new System.Text.UTF8Encoding(true));

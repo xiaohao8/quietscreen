@@ -1,4 +1,4 @@
-# Quiet · 屏息
+# QuietScreen 屏息
 
 **Screen off. Work on.** —— 屏幕熄了，活照干。
 

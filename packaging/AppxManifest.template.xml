@@ -16,7 +16,7 @@
             ProcessorArchitecture="x64"/>
 
   <Properties>
-    <DisplayName>Quiet 屏息</DisplayName>
+    <DisplayName>QuietScreen 屏息</DisplayName>
     <PublisherDisplayName>__PUBLISHER_DISPLAY_NAME__</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:AllowExternalContent>false</uap10:AllowExternalContent>
@@ -35,7 +35,7 @@
                  Executable="QuietScreen.exe"
                  EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-          DisplayName="Quiet 屏息"
+          DisplayName="QuietScreen 屏息"
           Description="虚拟屏守护与息屏远控工具: 创建 Parsec 虚拟屏、维持主屏、熄灭内屏、可选代理守护。"
           BackgroundColor="#17171F"
           Square150x150Logo="Assets\Square150x150Logo.png"
@@ -48,7 +48,7 @@
         <desktop:Extension Category="windows.startupTask"
                            Executable="QuietScreen.exe"
                            EntryPoint="Windows.FullTrustApplication">
-          <desktop:StartupTask TaskId="QuietScreenStartup" Enabled="false" DisplayName="Quiet 屏息"/>
+          <desktop:StartupTask TaskId="QuietScreenStartup" Enabled="false" DisplayName="QuietScreen 屏息"/>
         </desktop:Extension>
       </Extensions>
     </Application>

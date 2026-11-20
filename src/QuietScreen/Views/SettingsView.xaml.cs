@@ -14,6 +14,9 @@ namespace QuietScreen.Views
         public SettingsView()
         {
             InitializeComponent();
+            // 版本号随程序集自动更新 (不再手写死在 XAML 里)
+            var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            if (v != null) AboutText.Text = $"QuietScreen 屏息 v{v.Major}.{v.Minor}.{v.Build} — 虚拟屏守护与息屏远控工具。";
             Loaded += (s, e) => { RefreshAll(); _ = RefreshAutoStartAsync(); };
         }
 
@@ -24,9 +27,11 @@ namespace QuietScreen.Views
             CfgPathText.Text = "配置文件: " + AppConfig.ConfigPath;
             PatternBox.Text = AppConfig.Current.VirtualDisplayPattern;
             PreventSleepSwitch.IsChecked = AppConfig.Current.PreventSleepEnabled;
+            NightQuietSwitch.IsChecked = AppConfig.Current.NightAutoQuietEnabled;
             RefreshHotkeyText();
             _ = RefreshDriverAsync();
             _ = RefreshKeyboardInfoAsync();
+            _ = RefreshPowerModeAsync();
         }
 
         private async Task RefreshKeyboardInfoAsync()
@@ -158,18 +163,6 @@ namespace QuietScreen.Views
                 ToastService.Show("QuietScreen", "日志文件还没有生成");
         }
 
-        private void BtnOpenRgbOff_Click(object sender, RoutedEventArgs e)
-        {
-            BtnOpenRgbOff.IsEnabled = false;
-            Task.Run(() => KeyboardLightService.TrySoftwareLightsOff())
-                .ContinueWith(t =>
-                {
-                    var r = t.Result;
-                    ToastService.Show("QuietScreen", r.Message);
-                    Dispatcher.BeginInvoke(new Action(() => BtnOpenRgbOff.IsEnabled = true));
-                });
-        }
-
         private void BtnOpenRgbSite_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -177,6 +170,95 @@ namespace QuietScreen.Views
                 Process.Start(new ProcessStartInfo("https://openrgb.org") { UseShellExecute = true });
             }
             catch { }
+        }
+
+        // ---------------- 性能模式 (风扇降噪) ----------------
+
+        private static string LegionNameOf(int m) => m switch
+        {
+            0 => "野兽/狂暴",
+            1 => "均衡",
+            2 => "安静",
+            _ => "未知"
+        };
+
+        private static string OverlayNameOf(string g) => g switch
+        {
+            PowerModeService.OverlayBalanced => "平衡",
+            _ => g == PowerModeService.ResolveOverlay("efficiency") ? "最佳能效"
+               : g == PowerModeService.ResolveOverlay("performance") ? "最佳性能"
+               : g
+        };
+
+        private async Task RefreshPowerModeAsync()
+        {
+            var svc = PowerModeService.Instance;
+            await svc.ProbeLegionAsync();   // 只读探测 (Get, 不 Set)
+            if (svc.LegionAvailable)
+            {
+                int cur = await svc.GetLegionModeAsync();
+                LegionStatusText.Text = cur >= 0 ? "接口可用, 当前档位: " + LegionNameOf(cur) : "接口可用, 当前档位未知";
+                SetLegionButtons(true);
+            }
+            else
+            {
+                LegionStatusText.Text = "不可用 — " + svc.LegionUnavailableReason;
+                SetLegionButtons(false);
+            }
+            string overlay = await svc.GetActiveOverlayAsync();
+            if (overlay == null)
+            {
+                OverlayStatusText.Text = "本机不支持电源模式滑条 (旧版 Windows)";
+                SetOverlayButtons(false);
+            }
+            else
+            {
+                OverlayStatusText.Text = "当前: " + OverlayNameOf(overlay);
+                SetOverlayButtons(true);
+            }
+        }
+
+        private void SetLegionButtons(bool on)
+        {
+            BtnLegionBeast.IsEnabled = on;
+            BtnLegionBalanced.IsEnabled = on;
+            BtnLegionQuiet.IsEnabled = on;
+        }
+
+        private void SetOverlayButtons(bool on)
+        {
+            BtnOverlayEfficiency.IsEnabled = on;
+            BtnOverlayBalanced.IsEnabled = on;
+            BtnOverlayPerformance.IsEnabled = on;
+        }
+
+        private async void BtnLegionMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button b) || !(int.TryParse((string)b.Tag, out int mode))) return;
+            SetLegionButtons(false);
+            LegionStatusText.Text = "切换中...";
+            var r = await PowerModeService.Instance.SetLegionModeAsync((LegionMode)mode);
+            ToastService.Show("QuietScreen", "拯救者档位: " + r.msg);
+            await RefreshPowerModeAsync();
+        }
+
+        private async void BtnOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button b) || string.IsNullOrEmpty((string)b.Tag)) return;
+            SetOverlayButtons(false);
+            OverlayStatusText.Text = "切换中...";
+            string guid = PowerModeService.ResolveOverlay((string)b.Tag);   // 角色名 → 本机实际 GUID
+            var r = await PowerModeService.Instance.SetOverlayAsync(guid);
+            ToastService.Show("QuietScreen", "电源档: " + r.msg);
+            await RefreshPowerModeAsync();
+        }
+
+        private void NightQuiet_Changed(object sender, RoutedEventArgs e)
+        {
+            if (NightQuietSwitch.IsChecked == null) return;
+            AppConfig.Current.NightAutoQuietEnabled = NightQuietSwitch.IsChecked == true;
+            AppConfig.Save();
+            ToastService.Show("QuietScreen", "夜间自动降噪: " + (AppConfig.Current.NightAutoQuietEnabled ? "已开启" : "已关闭"));
         }
     }
 }

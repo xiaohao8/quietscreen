@@ -46,6 +46,7 @@ namespace QuietScreen.Core
         private static IntPtr _hook;
         private static LowLevelKeyboardProc _hookProc;
         private const int WH_KEYBOARD_LL = 13;
+        private static int _lastHookFire;   // LL 钩子防重复 (Environment.TickCount)
 
         public static bool InternalRegistered { get; private set; }
         public static bool ExternalRegistered { get; private set; }
@@ -155,7 +156,8 @@ namespace QuietScreen.Core
             if (msg != WM_HOTKEY) return IntPtr.Zero;
             handled = true;
             int id = wParam.ToInt32();
-            ActionQueue.Add(id == ID_INTERNAL ? Hotkey.Local : Hotkey.External);
+            // 队列满时 TryAdd 直接丢弃; Add 会阻塞消息线程, WM_HOTKEY 堆积会卡死界面
+            ActionQueue.TryAdd(id == ID_INTERNAL ? Hotkey.Local : Hotkey.External);
             return IntPtr.Zero;
         }
 
@@ -186,8 +188,11 @@ namespace QuietScreen.Core
                 if (kb.vkCode == VK_ESCAPE && ctrl && !alt && !win)
                 {
                     // Ctrl+Esc → 点亮内屏, 吞掉按键 (不打开开始菜单)
-                    InternalRegistered = true;
-                    ActionQueue.Add(Hotkey.Local);   // 钩子回调只入队, 微秒级返回
+                    // 按住不放会触发键盘自动重复: 400ms 内的重复事件只吞不响应
+                    int now = Environment.TickCount;
+                    bool repeat = _lastHookFire != 0 && now - _lastHookFire < 400;
+                    _lastHookFire = now;
+                    if (!repeat) ActionQueue.TryAdd(Hotkey.Local);   // 钩子回调只入队不阻塞 (满则丢弃), 微秒级返回
                     return new IntPtr(1);
                 }
             }

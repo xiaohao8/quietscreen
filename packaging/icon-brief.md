@@ -1,4 +1,4 @@
-# Quiet · 屏息 —— 图标设计说明（已实现）
+# QuietScreen 屏息 —— 图标设计说明（已实现）
 
 > 最终设计：**Night Screen / 熄屏之夜**
 > 主稿：`../../outputs/屏息-QuietScreen/icon/icon-1024.png`
@@ -6,7 +6,7 @@
 
 ## 产品
 
-- 名称：Quiet · 屏息（Windows 桌面应用）
+- 名称：QuietScreen 屏息（Windows 桌面应用）
 - 功能：让笔记本内置屏幕拓扑级断电，通过常驻虚拟显示器继续远程控制
 - 气质：安静、夜晚、克制、可靠
 

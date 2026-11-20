@@ -125,6 +125,16 @@ namespace QuietScreen.Core
             }
             catch (Exception ex) { Check("代理端口探测", false, ex.Message); }
 
+            // 8. 远控环境体检 (只读: 自动登录 / 屏保锁定 / 待重启更新 / 驱动 / 防睡眠)
+            try
+            {
+                foreach (var item in RemoteEnvCheck.Run())
+                {
+                    Check("环境体检: " + item.Name, item.Pass, item.Detail);
+                }
+            }
+            catch (Exception ex) { Check("远控环境体检", false, ex.Message); }
+
             Console.WriteLine("---- 结果 ----");
             foreach (var r in Results) Console.WriteLine(r);
             int failed = Results.Count(r => r.Contains("[FAIL]"));

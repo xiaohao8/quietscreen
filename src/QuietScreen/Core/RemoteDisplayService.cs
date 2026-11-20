@@ -410,6 +410,17 @@ namespace QuietScreen.Core
 
                     Thread.Sleep(1000);
                     var afterProcesses = GetSystemSettingsProcessIds();
+                    // 先礼后兵: 先优雅关闭 (设置页能保存状态), 顽固进程才结束
+                    foreach (int processId in afterProcesses.Except(beforeProcesses))
+                    {
+                        try
+                        {
+                            using var process = Process.GetProcessById(processId);
+                            if (!process.HasExited) process.CloseMainWindow();
+                        }
+                        catch { }
+                    }
+                    Thread.Sleep(1500);
                     foreach (int processId in afterProcesses.Except(beforeProcesses))
                     {
                         try

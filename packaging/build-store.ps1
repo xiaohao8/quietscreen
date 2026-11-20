@@ -22,6 +22,7 @@ param(
     [string]$Publisher = "CN=QuietScreen",
     [string]$PublisherDisplayName = "QuietScreen",
     [switch]$NoSign,
+    [string]$PublishDir = "",
     [switch]$Install
 )
 
@@ -38,7 +39,7 @@ Write-Host "Version=$Version Identity=$IdentityName Publisher=$Publisher"
 
 # ---------- 1. 发布 (自包含 x64) ----------
 Write-Host "[1/5] dotnet publish (self-contained x64)..." -ForegroundColor Yellow
-$PublishDir = Join-Path $BuildDir 'publish'
+if (-not $PublishDir) { $PublishDir = Join-Path $BuildDir 'publish' }
 dotnet publish $Src -c Release -r win-x64 --self-contained true -o $PublishDir
 if ($LASTEXITCODE -ne 0) { throw "publish 失败" }
 
@@ -86,17 +87,16 @@ if (-not $NoSign) {
     Write-Host "[4/5] 自签名 (仅本机测试用; 商店会重新签名)..." -ForegroundColor Yellow
     $pfx = Join-Path $BuildDir 'quietscreen-test.pfx'
     $cerPath = Join-Path $OutDir 'QuietScreen-Test.cer'
-    Remove-Item $pfx, $cerPath -Force -ErrorAction SilentlyContinue
 
-    # 用 Python 生成 PFX: 不写系统证书存储, 避免受限环境下的 NTE_PERM
-    $certPy = Join-Path $PackDir 'make-test-cert.py'
-    $made = $false
-    if ((Get-Command python -ErrorAction SilentlyContinue) -and (Test-Path $certPy)) {
-        python $certPy --subject $Publisher --pfx $pfx --cer $cerPath --password vddkeeper
-        if ($LASTEXITCODE -eq 0) { $made = $true }
-    }
-    if (-not $made) {
-        Write-Host "  Python 证书生成不可用, 回退到 New-SelfSignedCertificate..." -ForegroundColor Yellow
+    # 自签测试证书: 不写系统证书存储的 PFX 导出 (受信任环境里的 NTE_PERM 规避)
+    # 复用已有 pfx —— 每次换证书, 本机已信任的旧证书就失效, 升级安装会报 0x800B0109
+    if (Test-Path $pfx) {
+        Write-Host "  复用现有测试证书: $pfx"
+        if (-not (Test-Path $cerPath)) {
+            $loaded = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($pfx, 'vddkeeper')
+            [System.IO.File]::WriteAllBytes($cerPath, $loaded.Export('Cert'))
+        }
+    } else {
         $cert = New-SelfSignedCertificate -Type Custom -Subject $Publisher `
             -KeyUsage DigitalSignature -FriendlyName "QuietScreen test cert" `
             -CertStoreLocation "Cert:\CurrentUser\My" `
